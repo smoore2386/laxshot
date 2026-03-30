@@ -1,8 +1,7 @@
 {
   "projects": {
-    "default": "laxshot-dev",
-    "staging": "laxshot-staging",
-    "production": "laxshot-prod"
+    "default": "laxshot-app-d44c9",
+    "production": "laxshot-app-d44c9"
   },
   "targets": {},
   "etags": {}
