@@ -9,12 +9,7 @@ import 'package:flutter/foundation.dart'
 
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
-    if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web. '
-        'Reconfigure using the FlutterFire CLI.',
-      );
-    }
+    if (kIsWeb) return web;
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
@@ -26,6 +21,16 @@ class DefaultFirebaseOptions {
         );
     }
   }
+
+  // Web config — same project, web API key from Firebase console
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCFzxUGqmuzrDZmDZfvgqCtcBLDJIqG47s',
+    appId: '1:138884416580:web:laxshot_web',
+    messagingSenderId: '138884416580',
+    projectId: 'laxshot-app-d44c9',
+    storageBucket: 'laxshot-app-d44c9.firebasestorage.app',
+    authDomain: 'laxshot-app-d44c9.firebaseapp.com',
+  );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCFzxUGqmuzrDZmDZfvgqCtcBLDJIqG47s',

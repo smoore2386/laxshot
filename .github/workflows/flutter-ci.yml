@@ -1,0 +1,182 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/app/laxshot/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/app/laxshot/**'
+
+env:
+  FLUTTER_VERSION: '3.41.6'
+  WORKING_DIR: src/app/laxshot
+
+jobs:
+  # ── Analyze & Test ──────────────────────────────────────────────────────────
+  analyze:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed lib/
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Run tests
+        run: flutter test --coverage
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage/lcov.info
+          fail_ci_if_error: false
+
+  # ── Build iOS ───────────────────────────────────────────────────────────────
+  build-ios:
+    name: Build iOS
+    runs-on: macos-15
+    needs: analyze
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build iOS (no-codesign)
+        run: flutter build ios --release --no-codesign
+
+      - name: Upload iOS build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-${{ github.sha }}
+          path: ${{ env.WORKING_DIR }}/build/ios/iphoneos/Runner.app
+          retention-days: 7
+
+  # ── Build Android ───────────────────────────────────────────────────────────
+  build-android:
+    name: Build Android
+    runs-on: ubuntu-latest
+    needs: analyze
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Android APK (debug)
+        run: flutter build apk --debug
+
+      - name: Build Android App Bundle (release)
+        run: flutter build appbundle --release
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk-${{ github.sha }}
+          path: ${{ env.WORKING_DIR }}/build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 7
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab-${{ github.sha }}
+          path: ${{ env.WORKING_DIR }}/build/app/outputs/bundle/release/app-release.aab
+          retention-days: 7
+
+  # ── Screenshot Tests (iOS Simulator) ────────────────────────────────────────
+  screenshots:
+    name: Screenshot Tests
+    runs-on: macos-15
+    needs: analyze
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Boot iPhone 16 Simulator
+        run: |
+          DEVICE_ID=$(xcrun simctl list devices available -j \
+            | python3 -c "
+          import json,sys
+          d=json.load(sys.stdin)
+          for runtime,devices in d['devices'].items():
+            for dev in devices:
+              if 'iPhone 16' in dev['name'] and dev['isAvailable']:
+                print(dev['udid'])
+                exit()
+          ")
+          echo "SIMULATOR_UDID=$DEVICE_ID" >> $GITHUB_ENV
+          xcrun simctl boot $DEVICE_ID || true
+          xcrun simctl bootstatus $DEVICE_ID -b
+
+      - name: Run screenshot integration tests
+        run: |
+          flutter drive \
+            --driver=test_driver/integration_test.dart \
+            --target=integration_test/screenshot_test.dart \
+            -d $SIMULATOR_UDID
+        env:
+          SIMULATOR_UDID: ${{ env.SIMULATOR_UDID }}
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ github.sha }}
+          path: ${{ env.WORKING_DIR }}/screenshots/
+          retention-days: 30

@@ -110,7 +110,8 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
     if (mounted) {
       context.push(AppRoutes.results.replaceAll(':sessionId', 'new_${DateTime.now().millisecondsSinceEpoch}'));
     }
-    _ = file; // suppress unused warning — real upload goes here
+    // ignore: unused_local_variable
+    final unused = file; // real upload wired in next sprint
   }
 
   String get _formattedTime {
