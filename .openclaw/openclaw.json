@@ -1,0 +1,155 @@
+// Lacrosse App — OpenClaw Multi-Agent Configuration
+// =====================================================================
+// Three isolated agents, each with its own workspace:
+//   • engineering-backend  — API/server/database work (default)
+//   • engineering-frontend — UI/mobile/design work
+//   • marketing            — Campaigns, copy, analytics
+//
+// Setup: run ./setup-openclaw.sh from the repo root.
+// That script writes LACROSSE_APP_PATH to ~/.openclaw/.env so the paths
+// below resolve correctly at runtime.
+// Override the config path: OPENCLAW_CONFIG_PATH=$(pwd)/.openclaw/openclaw.json
+// =====================================================================
+{
+  // ── Model defaults (override per agent below) ──────────────────────
+  agents: {
+    defaults: {
+      model: {
+        primary: "anthropic/claude-opus-4-6",
+        fallbacks: ["openai/gpt-5.4", "openai/gpt-5.2"],
+      },
+      thinkingDefault: "low",
+      skipBootstrap: false,
+
+      // Heartbeat: periodic background check-ins (30 min default)
+      heartbeat: {
+        every: "30m",
+        lightContext: true,
+        isolatedSession: false,
+      },
+
+      // Subagents: backend and frontend can spawn each other
+      subagents: {
+        maxConcurrent: 3,
+        runTimeoutSeconds: 600,
+      },
+    },
+
+    // ── Agent list ────────────────────────────────────────────────────
+    list: [
+      // ── 1. Engineering — Backend ────────────────────────────────────
+      {
+        id: "engineering-backend",
+        default: true,
+        name: "Lacrosse Backend Engineer",
+        workspace: "${LACROSSE_APP_PATH}/.openclaw/workspace-engineering-backend",
+        identity: {
+          name: "BackClaw",
+          theme: "Expert backend engineer building the Lacrosse app API and data layer",
+          emoji: "⚙️",
+        },
+        tools: {
+          profile: "coding",         // exec + fs + sessions + memory + image
+          allow: ["group:web"],      // + web search/fetch for docs/research
+          deny: [],
+          elevated: { enabled: true },
+        },
+        subagents: {
+          allowAgents: ["engineering-frontend", "engineering-backend"],
+        },
+        groupChat: { mentionPatterns: ["@backclaw", "backclaw", "@backend"] },
+      },
+
+      // ── 2. Engineering — Frontend ───────────────────────────────────
+      {
+        id: "engineering-frontend",
+        name: "Lacrosse Frontend Engineer",
+        workspace: "${LACROSSE_APP_PATH}/.openclaw/workspace-engineering-frontend",
+        identity: {
+          name: "FrontClaw",
+          theme: "Expert frontend/mobile engineer building the Lacrosse app UI",
+          emoji: "🎨",
+        },
+        tools: {
+          profile: "coding",
+          allow: ["group:web"],
+          deny: [],
+          elevated: { enabled: true },
+        },
+        subagents: {
+          allowAgents: ["engineering-backend", "engineering-frontend"],
+        },
+        groupChat: { mentionPatterns: ["@frontclaw", "frontclaw", "@frontend"] },
+      },
+
+      // ── 3. Marketing ───────────────────────────────────────────────
+      {
+        id: "marketing",
+        name: "Lacrosse Marketing",
+        workspace: "${LACROSSE_APP_PATH}/.openclaw/workspace-marketing",
+        identity: {
+          name: "PitchClaw",
+          theme: "Lacrosse app marketing strategist and copywriter",
+          emoji: "📣",
+        },
+        tools: {
+          // Web research + file read/write + sessions; no shell exec
+          profile: "messaging",
+          allow: ["group:web", "group:fs"],
+          deny: ["group:runtime"],
+        },
+        subagents: {
+          allowAgents: [],  // marketing does not spawn sub-agents
+        },
+        groupChat: { mentionPatterns: ["@pitchclaw", "pitchclaw", "@marketing"] },
+      },
+    ],
+  }, // end agents
+
+  // ── Multi-agent routing ─────────────────────────────────────────────
+  // Uncomment and fill in your actual channel/peer IDs to route traffic
+  // to specific agents. Without bindings every message goes to the default
+  // agent (engineering-backend).
+  //
+  // bindings: [
+  //   // Example: route a dedicated Telegram group to marketing
+  //   { agentId: "marketing", match: { channel: "telegram", peer: { kind: "group", id: "-1001234567890" } } },
+  //   // Example: route a Discord channel to frontend engineer
+  //   { agentId: "engineering-frontend", match: { channel: "discord", peer: { kind: "channel", id: "123456789" } } },
+  // ],
+
+  // ── Cross-agent messaging ───────────────────────────────────────────
+  tools: {
+    agentToAgent: {
+      enabled: true,
+      allow: ["engineering-backend", "engineering-frontend", "marketing"],
+    },
+    sessions: {
+      visibility: "tree",  // agents can see their own subagent sessions
+    },
+  },
+
+  // ── Session resets ──────────────────────────────────────────────────
+  session: {
+    reset: {
+      mode: "daily",
+      atHour: 4,   // reset at 4 AM
+    },
+    agentToAgent: { maxPingPongTurns: 8 },
+  },
+
+  // ── Config hot reload ────────────────────────────────────────────────
+  gateway: {
+    reload: {
+      mode: "hybrid",
+      debounceMs: 300,
+    },
+  },
+
+  // ── Logging ──────────────────────────────────────────────────────────
+  logging: {
+    level: "info",
+    consoleStyle: "pretty",
+    redactSensitive: "tools",
+  },
+}
