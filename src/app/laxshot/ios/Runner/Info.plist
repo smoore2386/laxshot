@@ -2,6 +2,22 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- ── Privacy usage descriptions (App Store required) ── -->
+	<key>NSCameraUsageDescription</key>
+	<string>LaxShot uses the camera to record and analyze your lacrosse shots and saves.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>LaxShot can save your session recordings to your photo library.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>LaxShot saves your session recordings to your photo library.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>LaxShot may capture audio during recording sessions.</string>
+
+	<!-- ── COPPA / under-13 compliance ── -->
+	<!-- ITSAppUsesNonExemptEncryption: false because we use HTTPS only (Apple standard networking) -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+
+	<!-- ── Performance ── -->
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
