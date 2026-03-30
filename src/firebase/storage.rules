@@ -1,0 +1,51 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ─── Helper Functions ───────────────────────────────────────────────────────
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // 500 MB limit on all uploads
+    function withinSizeLimit() {
+      return request.resource.size <= 500 * 1024 * 1024;
+    }
+
+    // Only allow video and image MIME types
+    function isAllowedContentType() {
+      return request.resource.contentType.matches('video/.*') ||
+             request.resource.contentType.matches('image/.*');
+    }
+
+    // ─── User Media ─────────────────────────────────────────────────────────────
+    // Path structure: users/{userId}/sessions/{sessionId}/{filename}
+    //                 users/{userId}/thumbnails/{filename}
+    //                 users/{userId}/profile/{filename}
+
+    match /users/{userId}/{allPaths=**} {
+      // Read: only the owning user (parents access via Cloud Function signed URLs)
+      allow read: if isOwner(userId);
+
+      // Write: owner only, within size limit, valid content type
+      allow write: if isOwner(userId) &&
+                      withinSizeLimit() &&
+                      isAllowedContentType();
+
+      // Delete: owner only
+      allow delete: if isOwner(userId);
+    }
+
+    // ─── Deny Everything Else ───────────────────────────────────────────────────
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

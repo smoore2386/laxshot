@@ -1,0 +1,121 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper Functions ───────────────────────────────────────────────────────
+
+    // Verify the requesting user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Verify the requesting user owns the document path
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Verify the requesting user is a parent linked to the child UID
+    function isParentOf(childUserId) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(childUserId)) &&
+        get(/databases/$(database)/documents/users/$(childUserId)).data.parentUid == request.auth.uid;
+    }
+
+    // Verify the child account has parental approval (required for under-13 writes)
+    function isParentApproved(userId) {
+      let userDoc = get(/databases/$(database)/documents/users/$(userId));
+      return !userDoc.data.isMinor || userDoc.data.parentApproved == true;
+    }
+
+    // Check if the current user is a minor via custom claims
+    function isMinorClaim() {
+      return request.auth.token.isMinor == true;
+    }
+
+    // Ensure only allowed fields are present in an update (no schema drift)
+    function onlyFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // ─── Users Collection ───────────────────────────────────────────────────────
+
+    match /users/{userId} {
+      // User can read/write their own root doc; parent can read child doc
+      allow read: if isOwner(userId) || isParentOf(userId);
+
+      // Create: only the owning user, via Cloud Function (admin SDK bypasses rules,
+      // but if written client-side we enforce minimal fields)
+      allow create: if isOwner(userId) &&
+        request.resource.data.keys().hasAll(['createdAt', 'isMinor']) &&
+        request.resource.data.createdAt == request.time;
+
+      // Update: owner only; if minor, parentApproved must not be downgraded
+      allow update: if isOwner(userId) &&
+        // Prevent client from promoting their own parentApproved flag
+        !(request.resource.data.diff(resource.data).affectedKeys().hasAny(['parentApproved', 'isMinor', 'parentUid']));
+
+      // Delete: only via Cloud Function (admin SDK); deny client-side deletes
+      allow delete: if false;
+
+      // ─── Profile Sub-document ──────────────────────────────────────────────
+
+      match /profile/{document=**} {
+        allow read: if isOwner(userId) || isParentOf(userId);
+        allow write: if isOwner(userId);
+      }
+
+      // ─── Settings Sub-document ─────────────────────────────────────────────
+
+      match /settings/{document=**} {
+        allow read: if isOwner(userId) || isParentOf(userId);
+        allow write: if isOwner(userId);
+      }
+
+      // ─── Sessions Sub-collection ───────────────────────────────────────────
+
+      match /sessions/{sessionId} {
+        // Parent can read child's sessions
+        allow read: if isOwner(userId) || isParentOf(userId);
+
+        // Under-13 users must have parentApproved before creating sessions
+        allow create: if isOwner(userId) &&
+          isParentApproved(userId) &&
+          request.resource.data.keys().hasAll(['date', 'duration']) &&
+          request.resource.data.date is timestamp &&
+          request.resource.data.duration is number &&
+          request.resource.data.duration > 0;
+
+        // Updates allowed for session owner; cannot change date or userId
+        allow update: if isOwner(userId) &&
+          isParentApproved(userId) &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['date', 'userId']);
+
+        // Owner can delete their own sessions
+        allow delete: if isOwner(userId);
+      }
+
+      // ─── Stats Sub-document ────────────────────────────────────────────────
+
+      match /stats/{document=**} {
+        // Stats are read by owner or parent; written only by Cloud Functions (admin SDK)
+        allow read: if isOwner(userId) || isParentOf(userId);
+        // Client-side writes denied — aggregateStats Cloud Function uses admin SDK
+        allow write: if false;
+      }
+    }
+
+    // ─── COPPA Consent Tokens ───────────────────────────────────────────────────
+    // Written by Cloud Functions only; no client access
+
+    match /consentTokens/{tokenId} {
+      allow read, write: if false;
+    }
+
+    // ─── Deny All Other Paths ───────────────────────────────────────────────────
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

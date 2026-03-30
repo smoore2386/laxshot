@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "default": "laxshot-dev",
+    "staging": "laxshot-staging",
+    "production": "laxshot-prod"
+  },
+  "targets": {},
+  "etags": {}
+}
