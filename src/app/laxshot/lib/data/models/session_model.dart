@@ -53,6 +53,12 @@ class SessionModel {
   double get accuracy =>
       totalShots == 0 ? 0.0 : successfulShots / totalShots;
 
+  // UI aliases
+  String get id => sessionId;
+  Timestamp get date => Timestamp.fromDate(recordedAt);
+  List<dynamic> get shots => List.generate(totalShots, (_) => null);
+  double get overallScore => accuracy * 100;
+
   factory SessionModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return SessionModel(

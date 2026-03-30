@@ -29,6 +29,18 @@ class StatsModel {
   double get overallAccuracy =>
       totalShots == 0 ? 0.0 : totalSuccessful / totalShots;
 
+  // Convenience aliases used by UI
+  double get avgScore => overallAccuracy * 100;
+  double get bestScore => bestAccuracy * 100;
+  int get streakDays => currentStreak;
+
+  /// Map of zone label (TL, TC, TR, ML, ...) → accuracy 0.0–1.0
+  Map<String, double> get zoneAccuracy {
+    const labels = ['TL', 'TC', 'TR', 'ML', 'MC', 'MR', 'BL', 'BC', 'BR'];
+    final zones = lifetimeZoneAccuracy.accuracyByZone;
+    return {for (var i = 0; i < labels.length; i++) labels[i]: zones[i]};
+  }
+
   factory StatsModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return StatsModel(

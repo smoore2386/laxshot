@@ -6,12 +6,12 @@ import '../../../data/models/user_model.dart';
 
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 
-final userRepositoryProvider =
-    Provider<UserRepository>((ref) => UserRepository());
-
 final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(authServiceProvider).authStateChanges;
 });
+
+// Alias — used by stats/camera providers that just need the raw Firebase user
+final firebaseUserProvider = authStateProvider;
 
 final currentUserModelProvider = StreamProvider<UserModel?>((ref) {
   final authState = ref.watch(authStateProvider);

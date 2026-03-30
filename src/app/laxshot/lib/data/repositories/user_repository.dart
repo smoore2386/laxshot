@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_model.dart';
+import '../models/stats_model.dart';
+
+final userRepositoryProvider = Provider<UserRepository>((_) => UserRepository());
 
 class UserRepository {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -44,6 +48,26 @@ class UserRepository {
 
   Future<void> updateUser(String uid, Map<String, dynamic> fields) =>
       _db.collection('users').doc(uid).update(fields);
+
+  Future<StatsModel?> getStats(String uid) async {
+    final doc = await _db
+        .collection('users')
+        .doc(uid)
+        .collection('stats')
+        .doc('summary')
+        .get();
+    if (!doc.exists) return null;
+    return StatsModel.fromFirestore(doc);
+  }
+
+  Stream<StatsModel?> watchStats(String uid) =>
+      _db
+          .collection('users')
+          .doc(uid)
+          .collection('stats')
+          .doc('summary')
+          .snapshots()
+          .map((doc) => doc.exists ? StatsModel.fromFirestore(doc) : null);
 
   int _calcAge(DateTime dob) {
     final now = DateTime.now();

@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/session_model.dart';
 import '../models/stats_model.dart';
+
+final sessionRepositoryProvider = Provider<SessionRepository>((_) => SessionRepository());
 
 class SessionRepository {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -14,13 +17,20 @@ class SessionRepository {
     return SessionModel.fromFirestore(doc);
   }
 
+  Future<List<SessionModel>> getRecentSessions(String uid, {int limit = 10}) async {
+    final snap = await _sessions(uid)
+        .orderBy('recordedAt', descending: true)
+        .limit(limit)
+        .get();
+    return snap.docs.map(SessionModel.fromFirestore).toList();
+  }
+
   Stream<List<SessionModel>> watchRecentSessions(String uid, {int limit = 10}) =>
       _sessions(uid)
           .orderBy('recordedAt', descending: true)
           .limit(limit)
           .snapshots()
-          .map((snap) =>
-              snap.docs.map(SessionModel.fromFirestore).toList());
+          .map((snap) => snap.docs.map(SessionModel.fromFirestore).toList());
 
   Stream<SessionModel?> watchSession(String uid, String sessionId) =>
       _sessions(uid).doc(sessionId).snapshots().map(
@@ -31,24 +41,4 @@ class SessionRepository {
     final ref = await _sessions(uid).add(session.toFirestore());
     return ref.id;
   }
-
-  Future<StatsModel?> getStats(String uid) async {
-    final doc = await _db
-        .collection('users')
-        .doc(uid)
-        .collection('stats')
-        .doc('summary')
-        .get();
-    if (!doc.exists) return null;
-    return StatsModel.fromFirestore(doc);
-  }
-
-  Stream<StatsModel?> watchStats(String uid) =>
-      _db
-          .collection('users')
-          .doc(uid)
-          .collection('stats')
-          .doc('summary')
-          .snapshots()
-          .map((doc) => doc.exists ? StatsModel.fromFirestore(doc) : null);
 }
