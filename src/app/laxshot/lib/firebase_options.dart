@@ -15,6 +15,8 @@ class DefaultFirebaseOptions {
         return android;
       case TargetPlatform.iOS:
         return ios;
+      case TargetPlatform.macOS:
+        return macos;
       default:
         throw UnsupportedError(
           'DefaultFirebaseOptions are not supported for this platform.',
@@ -41,6 +43,15 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyCgr_oOBZkT4tkfmxv3dAkloXvAXFyhD1g',
+    appId: '1:138884416580:ios:eb1f3eb2a97ccfa0142811',
+    messagingSenderId: '138884416580',
+    projectId: 'laxshot-app-d44c9',
+    storageBucket: 'laxshot-app-d44c9.firebasestorage.app',
+    iosBundleId: 'com.laxshot.app',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyCgr_oOBZkT4tkfmxv3dAkloXvAXFyhD1g',
     appId: '1:138884416580:ios:eb1f3eb2a97ccfa0142811',
     messagingSenderId: '138884416580',
