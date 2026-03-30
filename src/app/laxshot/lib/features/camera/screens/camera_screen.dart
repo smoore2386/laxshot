@@ -7,7 +7,7 @@ import 'package:camera/camera.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/constants/app_sizes.dart';
-import '../providers/camera_provider.dart';
+import '../../analysis/providers/ml_provider.dart';
 
 enum RecordingMode { player, goalie }
 
@@ -103,15 +103,26 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
   Future<void> _stopRecording() async {
     _recordingTimer?.cancel();
     if (_controller == null || !_isRecording) return;
-    final file = await _controller!.stopVideoRecording();
+
+    final videoFile = await _controller!.stopVideoRecording();
     setState(() => _isRecording = false);
-    // In production: upload via camera provider, then navigate to results
-    // For now navigate with a placeholder sessionId
-    if (mounted) {
-      context.push(AppRoutes.results.replaceAll(':sessionId', 'new_${DateTime.now().millisecondsSinceEpoch}'));
+
+    // Capture a still frame for ML analysis (lighter than full video inference)
+    String? framePath;
+    try {
+      final image = await _controller!.takePicture();
+      framePath = image.path;
+    } catch (_) {
+      // Fall back to video file path if still capture fails
+      framePath = videoFile.path;
     }
-    // ignore: unused_local_variable
-    final unused = file; // real upload wired in next sprint
+
+    // Kick off ML analysis before navigating — provider handles async loading state
+    if (mounted) {
+      ref.read(analysisNotifierProvider.notifier).analyze(framePath);
+      final sessionId = 'new_${DateTime.now().millisecondsSinceEpoch}';
+      context.push(AppRoutes.results.replaceAll(':sessionId', sessionId));
+    }
   }
 
   String get _formattedTime {
@@ -267,7 +278,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
                           border: Border.all(color: Colors.white, width: 4),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.red.withOpacity(0.5),
+                              color: Colors.red.withValues(alpha: 0.5),
                               blurRadius: 16,
                               spreadRadius: 2,
                             ),
