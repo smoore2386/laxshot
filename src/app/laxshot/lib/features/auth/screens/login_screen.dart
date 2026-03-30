@@ -61,20 +61,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.watch(authNotifierProvider);
     final isLoading = authState.isLoading;
 
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSizes.lg),
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.fromLTRB(
+            AppSizes.lg,
+            AppSizes.md,
+            AppSizes.lg,
+            AppSizes.xl + bottomInset,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: AppSizes.xl),
+                const SizedBox(height: AppSizes.md),
 
-                const Center(child: LaxShotLogo(size: 80, showLabel: true)),
+                const Center(child: LaxShotLogo(size: 64, showLabel: true)),
 
-                const SizedBox(height: AppSizes.xl),
+                const SizedBox(height: AppSizes.lg),
 
                 Text(
                   'Welcome back',
@@ -92,7 +100,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   textAlign: TextAlign.center,
                 ),
 
-                const SizedBox(height: AppSizes.xl),
+                const SizedBox(height: AppSizes.lg),
 
                 // Email field
                 TextFormField(
@@ -221,7 +229,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
 
-                const SizedBox(height: AppSizes.xl),
+                const SizedBox(height: AppSizes.lg),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -236,6 +244,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ],
                 ),
+
+                // Bottom breathing room — ensures Sign Up row is never clipped
+                const SizedBox(height: AppSizes.lg),
               ],
             ),
           ),

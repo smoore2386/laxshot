@@ -129,8 +129,8 @@ jobs:
           retention-days: 7
 
   # ── Screenshot Tests (iOS Simulator) ────────────────────────────────────────
-  screenshots:
-    name: Screenshot Tests
+  screenshots-ios:
+    name: Screenshot Tests (iOS)
     runs-on: macos-15
     needs: analyze
     defaults:
@@ -149,6 +149,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Install CocoaPods dependencies
+        run: |
+          cd ios
+          pod install --repo-update
+        continue-on-error: false
+
       - name: Boot iPhone 16 Simulator
         run: |
           DEVICE_ID=$(xcrun simctl list devices available -j \
@@ -161,22 +167,93 @@ jobs:
                 print(dev['udid'])
                 exit()
           ")
+          if [ -z "$DEVICE_ID" ]; then
+            echo "ERROR: iPhone 16 simulator not found"
+            xcrun simctl list devices available | grep iPhone
+            exit 1
+          fi
           echo "SIMULATOR_UDID=$DEVICE_ID" >> $GITHUB_ENV
-          xcrun simctl boot $DEVICE_ID || true
-          xcrun simctl bootstatus $DEVICE_ID -b
+          xcrun simctl boot "$DEVICE_ID" || true
+          xcrun simctl bootstatus "$DEVICE_ID" -b
 
       - name: Run screenshot integration tests
         run: |
           flutter drive \
             --driver=test_driver/integration_test.dart \
             --target=integration_test/screenshot_test.dart \
-            -d $SIMULATOR_UDID
+            -d "$SIMULATOR_UDID"
         env:
           SIMULATOR_UDID: ${{ env.SIMULATOR_UDID }}
 
-      - name: Upload screenshots
+      - name: Collect raw screenshots (fallback if driver doesn't write them)
+        if: always()
+        run: |
+          mkdir -p screenshots
+          xcrun simctl io "$SIMULATOR_UDID" screenshot screenshots/login_fallback.png || true
+        env:
+          SIMULATOR_UDID: ${{ env.SIMULATOR_UDID }}
+
+      - name: Upload iOS screenshots
         uses: actions/upload-artifact@v4
         with:
-          name: screenshots-${{ github.sha }}
+          name: screenshots-ios-${{ github.sha }}
+          path: ${{ env.WORKING_DIR }}/screenshots/
+          retention-days: 30
+
+  # ── Screenshot Tests (Android Emulator) ─────────────────────────────────────
+  screenshots-android:
+    name: Screenshot Tests (Android)
+    runs-on: ubuntu-latest
+    needs: analyze
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run screenshot tests on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_6
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: |
+            cd ${{ env.WORKING_DIR }}
+            EMULATOR_ID=$(flutter devices | grep emulator | awk '{print $1}' | head -1)
+            flutter drive \
+              --driver=test_driver/integration_test.dart \
+              --target=integration_test/screenshot_test.dart \
+              -d "$EMULATOR_ID" || true
+            mkdir -p screenshots
+            adb exec-out screencap -p > screenshots/android_fallback.png || true
+
+      - name: Upload Android screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-android-${{ github.sha }}
           path: ${{ env.WORKING_DIR }}/screenshots/
           retention-days: 30

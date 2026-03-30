@@ -20,7 +20,10 @@ dependencies:
 
   # Camera & ML
   camera: ^0.11.0
-  # google_mlkit_pose_detection: ^0.14.0  # Re-enable when building for real device; incompatible with iOS 26 simulator (arm64)
+  # ML: TFLite Interpreter (cross-platform, no arm64 sim conflicts) is primary.
+  # google_mlkit_pose_detection: ^0.14.0  # Keep disabled — incompatible with iOS 26 simulator (arm64). Re-enable for real-device TestFlight builds only.
+  flutter_tflite: ^1.0.1            # TFLite runtime — works on iOS 26 simulator + real device
+  # tflite_flutter: ^0.10.4         # Alternative lower-level binding if flutter_tflite proves limiting
   video_player: ^2.9.1
   image_picker: ^1.1.2
 
@@ -51,3 +54,4 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/models/
