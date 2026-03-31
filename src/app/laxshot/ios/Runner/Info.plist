@@ -17,6 +17,22 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 
+	<!-- ── Google Sign-In: REVERSED_CLIENT_ID URL scheme ── -->
+	<!-- Replace REPLACE_WITH_REVERSED_CLIENT_ID with the value from GoogleService-Info.plist -->
+	<!-- Download GoogleService-Info.plist from: https://console.firebase.google.com/project/laxshot-app-d44c9/settings/general/ios -->
+	<!-- Then copy the REVERSED_CLIENT_ID value and replace the placeholder below -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>REPLACE_WITH_REVERSED_CLIENT_ID</string>
+			</array>
+		</dict>
+	</array>
+
 	<!-- ── Performance ── -->
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>

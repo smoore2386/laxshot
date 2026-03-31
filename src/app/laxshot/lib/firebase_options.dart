@@ -48,7 +48,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '138884416580',
     projectId: 'laxshot-app-d44c9',
     storageBucket: 'laxshot-app-d44c9.firebasestorage.app',
-    iosBundleId: 'com.laxshot.app',
+    iosBundleId: 'com.laxshot.laxshot',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -57,6 +57,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '138884416580',
     projectId: 'laxshot-app-d44c9',
     storageBucket: 'laxshot-app-d44c9.firebasestorage.app',
-    iosBundleId: 'com.laxshot.app',
+    iosBundleId: 'com.laxshot.laxshot',
   );
 }

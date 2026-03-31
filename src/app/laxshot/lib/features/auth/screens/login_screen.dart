@@ -95,7 +95,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Text(
                   'Sign in to continue your training',
                   style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -197,7 +197,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: Text(
                         'or',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.5),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                         ),
                       ),
                     ),
@@ -211,7 +211,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 SizedBox(
                   height: AppSizes.buttonHeight,
                   child: OutlinedButton.icon(
-                    onPressed: isLoading ? null : () => _showSocialComingSoon(context, 'Google'),
+                    onPressed: isLoading ? null : _signInWithGoogle,
                     icon: const _GoogleIcon(),
                     label: const Text('Continue with Google'),
                   ),
@@ -223,7 +223,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 SizedBox(
                   height: AppSizes.buttonHeight,
                   child: OutlinedButton.icon(
-                    onPressed: isLoading ? null : () => _showSocialComingSoon(context, 'Apple'),
+                    onPressed: isLoading ? null : _signInWithApple,
                     icon: const Icon(Icons.apple, size: 20),
                     label: const Text('Continue with Apple'),
                   ),
@@ -297,9 +297,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  void _showSocialComingSoon(BuildContext context, String provider) {
+  Future<void> _signInWithGoogle() async {
+    await ref.read(authNotifierProvider.notifier).signInWithGoogle();
+    if (!mounted) return;
+    _handleSocialError();
+  }
+
+  Future<void> _signInWithApple() async {
+    await ref.read(authNotifierProvider.notifier).signInWithApple();
+    if (!mounted) return;
+    _handleSocialError();
+  }
+
+  void _handleSocialError() {
+    final err = ref.read(authNotifierProvider).error;
+    if (err == null) return;
+    final msg = err.toString();
+    if (msg.contains('cancelled') || msg.contains('cancel')) return; // user dismissed sheet
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$provider sign-in coming soon.')),
+      SnackBar(
+        content: Text(_friendlyError(msg)),
+        backgroundColor: AppColors.error,
+      ),
     );
   }
 }
