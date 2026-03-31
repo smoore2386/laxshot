@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>138884416580-vjtcu5vak8st23dp7l2aphhg3h6fagcn.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.138884416580-vjtcu5vak8st23dp7l2aphhg3h6fagcn</string>
 	<key>API_KEY</key>
 	<string>AIzaSyCgr_oOBZkT4tkfmxv3dAkloXvAXFyhD1g</string>
 	<key>GCM_SENDER_ID</key>
@@ -9,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.laxshot.app</string>
+	<string>com.laxshot.laxshot</string>
 	<key>PROJECT_ID</key>
 	<string>laxshot-app-d44c9</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:138884416580:ios:eb1f3eb2a97ccfa0142811</string>
+	<string>1:138884416580:ios:7d6a97822df61ba7142811</string>
 </dict>
 </plist>
