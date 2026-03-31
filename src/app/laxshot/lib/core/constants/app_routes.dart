@@ -15,4 +15,8 @@ class AppRoutes {
   static const String settings = '/settings';
 
   static String resultsPath(String sessionId) => '/results/$sessionId';
+
+  /// Dev-only bypass route — navigates straight to home without auth.
+  /// Only reachable in debug builds.
+  static const String devBypass = '/dev/bypass';
 }

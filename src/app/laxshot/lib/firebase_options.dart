@@ -34,15 +34,9 @@ class DefaultFirebaseOptions {
     authDomain: 'laxshot-app-d44c9.firebaseapp.com',
   );
 
-  // ⚠️  Android: google-services.json currently registers com.laxshot.app
-  // but the app's applicationId is com.laxshot.laxshot.
-  // ACTION REQUIRED: In Firebase console → Project Settings → Add Android app
-  //   Package name: com.laxshot.laxshot
-  //   Download the new google-services.json → android/app/google-services.json
-  //   Then update appId below with the new GOOGLE_APP_ID value.
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCFzxUGqmuzrDZmDZfvgqCtcBLDJIqG47s',
-    appId: '1:138884416580:android:015ab78ff4425532142811', // TODO: update after re-registering
+    appId: '1:138884416580:android:637a84270be9bac9142811',
     messagingSenderId: '138884416580',
     projectId: 'laxshot-app-d44c9',
     storageBucket: 'laxshot-app-d44c9.firebasestorage.app',

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:flutter/foundation.dart';
+
+import '../../../core/config/dev_config.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/constants/app_sizes.dart';
@@ -20,6 +23,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   bool _obscurePassword = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill credentials in debug mode to save typing
+    if (kDebugMode && DevConfig.devEmail != null) {
+      _emailCtrl.text = DevConfig.devEmail!;
+      _passwordCtrl.text = DevConfig.devPassword ?? '';
+    }
+  }
 
   @override
   void dispose() {
@@ -244,6 +257,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ],
                 ),
+
+                // ── Dev bypass (debug builds only) ────────────────────────
+                if (kDebugMode && DevConfig.enableDevBypass) ...[
+                  const SizedBox(height: AppSizes.md),
+                  const Divider(),
+                  const SizedBox(height: AppSizes.xs),
+                  Center(
+                    child: Text(
+                      '🛠 DEBUG BUILD',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.orange.shade700,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSizes.sm),
+                  SizedBox(
+                    height: AppSizes.buttonHeight,
+                    child: OutlinedButton.icon(
+                      onPressed: () => context.go(AppRoutes.home),
+                      icon: const Icon(Icons.fast_forward_rounded, color: Colors.orange),
+                      label: const Text(
+                        'Skip Login (Dev)',
+                        style: TextStyle(color: Colors.orange),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.orange),
+                      ),
+                    ),
+                  ),
+                ],
 
                 // Bottom breathing room — ensures Sign Up row is never clipped
                 const SizedBox(height: AppSizes.lg),

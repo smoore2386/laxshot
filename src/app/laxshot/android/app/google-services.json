@@ -7,12 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:138884416580:android:015ab78ff4425532142811",
+        "mobilesdk_app_id": "1:138884416580:android:637a84270be9bac9142811",
         "android_client_info": {
-          "package_name": "com.laxshot.app"
+          "package_name": "com.laxshot.laxshot"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "138884416580-hb2vk6ugoqd5fl7j5ekdrr67bbm7bvs8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCFzxUGqmuzrDZmDZfvgqCtcBLDJIqG47s"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "138884416580-hb2vk6ugoqd5fl7j5ekdrr67bbm7bvs8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

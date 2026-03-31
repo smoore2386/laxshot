@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/constants/app_routes.dart';
+import '../core/config/dev_config.dart';
 import '../features/auth/providers/auth_provider.dart';
 import '../features/auth/screens/age_gate_screen.dart';
 import '../features/auth/screens/login_screen.dart';
@@ -30,15 +32,24 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final path = state.uri.path;
 
+      // Dev bypass: skip auth entirely in debug builds
+      if (kDebugMode && DevConfig.enableDevBypass && path == AppRoutes.devBypass) {
+        return AppRoutes.home;
+      }
+
       // Public routes — no redirect needed
       final publicRoutes = [
         AppRoutes.onboarding,
         AppRoutes.parentalConsent,
         AppRoutes.login,
         AppRoutes.signup,
+        if (kDebugMode) AppRoutes.devBypass,
       ];
 
       if (!isAuthenticated) {
+        // Dev bypass: allow any navigation in debug mode when bypass is enabled
+        if (kDebugMode && DevConfig.enableDevBypass) return null;
+
         if (publicRoutes.any((r) => path.startsWith(r.split(':').first))) {
           return null;
         }
