@@ -1,0 +1,15 @@
+Item,Qty,Description,Unit Price,Total,Source,Notes
+Seeed XIAO nRF52840 Sense,5,"MCU + BLE 5.0 + LSM6DS3 IMU, 21x17.8mm",$15.99,$79.95,Seeed Studio,seeedstudio.com/Seeed-XIAO-BLE-Sense-nRF52840-p-5253.html
+300mAh 3.7V LiPo Battery,5,"402025 form, JST-PH 2.0mm, protected",$3.50,$17.50,Amazon/DigiKey,Must have JST-PH 2.0mm connector
+LaxPod Body - Men's 1in (SLA),3,"Rigid 10K resin, 0.05mm layers",$18.00,$54.00,Xometry,Upload STL
+LaxPod Body - Women's 7/8in (SLA),2,"Rigid 10K resin, 0.05mm layers",$18.00,$36.00,Xometry,Upload STL
+LaxPod Lid (SLA),5,"Rigid 10K resin, same lid fits both",$8.00,$40.00,Xometry,Upload STL
+M1.6x4mm Screws,1 pack (50pc),"Pan head, Phillips",$5.99,$5.99,Amazon,For board standoff mounting
+M1.6 Hex Nuts,1 pack (50pc),Standard hex,$4.99,$4.99,Amazon,Pairs with M1.6 screws
+30AWG Silicone Wire,1 spool (25ft),"Red + black, flexible",$6.99,$6.99,Amazon,Battery wiring
+JST-PH 2.0mm Connectors,1 kit (20 pairs),"2-pin, male+female with pre-crimped wires",$7.99,$7.99,Amazon,For battery connections
+Heat Shrink Tubing,1 kit,"Assorted sizes, 2:1 ratio",$5.99,$5.99,Amazon,Wire insulation
+USB-C Data Cable,2,"Short, for flashing + charging",$7.99,$15.98,Amazon,
+Double-sided Foam Tape,1 roll,"1mm thick, 3M",$4.99,$4.99,Amazon,Battery retention in pocket
+,,,,,,
+,,,TOTAL:,$280.38,,

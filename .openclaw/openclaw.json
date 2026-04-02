@@ -1,8 +1,9 @@
 // Lacrosse App — OpenClaw Multi-Agent Configuration
 // =====================================================================
-// Three isolated agents, each with its own workspace:
+// Four isolated agents, each with its own workspace:
 //   • engineering-backend  — API/server/database work (default)
 //   • engineering-frontend — UI/mobile/design work
+//   • hardware             — Sensor pod firmware, enclosures, BLE protocol
 //   • marketing            — Campaigns, copy, analytics
 //
 // Setup: run ./setup-openclaw.sh from the repo root.
@@ -103,6 +104,28 @@
         },
         groupChat: { mentionPatterns: ["@pitchclaw", "pitchclaw", "@marketing"] },
       },
+
+      // ── 4. Hardware — Sensor Pod Engineering ─────────────────────────
+      {
+        id: "hardware",
+        name: "Lacrosse Hardware Engineer",
+        workspace: "${LACROSSE_APP_PATH}/.openclaw/workspace-hardware",
+        identity: {
+          name: "LaxForge",
+          theme: "Hardware engineer building the lacrosse stick sensor pod — firmware, enclosures, BLE protocol",
+          emoji: "🔧",
+        },
+        tools: {
+          profile: "coding",         // exec + fs + sessions + memory + image
+          allow: ["group:web"],      // + web search/fetch for datasheets/ordering
+          deny: [],
+          elevated: { enabled: true },
+        },
+        subagents: {
+          allowAgents: ["engineering-backend", "engineering-frontend"],
+        },
+        groupChat: { mentionPatterns: ["@laxforge", "laxforge", "@hardware"] },
+      },
     ],
   }, // end agents
 
@@ -115,13 +138,15 @@
     { agentId: "engineering-frontend", match: { channel: "discord", peer: { kind: "channel", id: "1488224925956178080" } } },
     // Marketing agent (mention @pitchclaw or pitchclaw)
     { agentId: "marketing", match: { channel: "discord", peer: { kind: "channel", id: "1488224925956178080" } } },
+    // Hardware agent (mention @laxforge or laxforge)
+    { agentId: "hardware", match: { channel: "discord", peer: { kind: "channel", id: "1488224925956178080" } } },
   ],
 
   // ── Cross-agent messaging ───────────────────────────────────────────
   tools: {
     agentToAgent: {
       enabled: true,
-      allow: ["engineering-backend", "engineering-frontend", "marketing"],
+      allow: ["engineering-backend", "engineering-frontend", "marketing", "hardware"],
     },
     sessions: {
       visibility: "tree",  // agents can see their own subagent sessions

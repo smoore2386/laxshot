@@ -5,16 +5,16 @@ import '../../../data/repositories/user_repository.dart';
 import '../../../data/repositories/session_repository.dart';
 import '../../auth/providers/auth_provider.dart';
 
-final userStatsProvider = FutureProvider<StatsModel?>((ref) async {
+final userStatsProvider = StreamProvider<StatsModel?>((ref) {
   final user = ref.watch(firebaseUserProvider).valueOrNull;
-  if (user == null) return null;
+  if (user == null) return Stream.value(null);
   final repo = ref.watch(userRepositoryProvider);
-  return repo.getStats(user.uid);
+  return repo.watchStats(user.uid);
 });
 
-final recentSessionsProvider = FutureProvider<List<SessionModel>>((ref) async {
+final recentSessionsProvider = StreamProvider<List<SessionModel>>((ref) {
   final user = ref.watch(firebaseUserProvider).valueOrNull;
-  if (user == null) return [];
+  if (user == null) return Stream.value([]);
   final repo = ref.watch(sessionRepositoryProvider);
-  return repo.getRecentSessions(user.uid, limit: 10);
+  return repo.watchRecentSessions(user.uid, limit: 10);
 });

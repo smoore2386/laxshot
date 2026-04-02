@@ -7,7 +7,11 @@ import 'package:camera/camera.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/constants/app_sizes.dart';
+import '../../../data/models/session_model.dart';
+import '../../../data/models/shot_classification.dart';
+import '../../../data/services/session_service.dart';
 import '../../analysis/providers/ml_provider.dart';
+import '../../auth/providers/auth_provider.dart';
 
 enum RecordingMode { player, goalie }
 
@@ -113,16 +117,75 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
       final image = await _controller!.takePicture();
       framePath = image.path;
     } catch (_) {
-      // Fall back to video file path if still capture fails
       framePath = videoFile.path;
     }
 
-    // Kick off ML analysis before navigating — provider handles async loading state
-    if (mounted) {
-      ref.read(analysisNotifierProvider.notifier).analyze(framePath);
-      final sessionId = 'new_${DateTime.now().millisecondsSinceEpoch}';
-      context.push(AppRoutes.results.replaceAll(':sessionId', sessionId));
+    if (!mounted) return;
+
+    // Show shot type picker, then run analysis + save
+    final selection = await _showShotTypePicker(context);
+    if (!mounted) return;
+
+    final user = ref.read(firebaseUserProvider).valueOrNull;
+    final uid = user?.uid;
+    final discipline = selection?.discipline ?? LacrosseDiscipline.mens;
+    final shotType = selection?.shotType;
+
+    // Kick off ML analysis
+    ref.read(analysisNotifierProvider.notifier).analyze(
+          framePath,
+          discipline: discipline,
+          shotType: shotType,
+        );
+
+    // Save session to Firestore in the background
+    String sessionId = 'new_${DateTime.now().millisecondsSinceEpoch}';
+    if (uid != null) {
+      _saveSession(
+        uid: uid,
+        durationSeconds: _recordingSeconds,
+      ).then((id) => sessionId = id);
     }
+
+    if (mounted) {
+      context.push(AppRoutes.resultsPath(sessionId));
+    }
+  }
+
+  Future<String> _saveSession({
+    required String uid,
+    required int durationSeconds,
+  }) async {
+    // Wait briefly for analysis to finish so we can persist the score
+    await Future.delayed(const Duration(milliseconds: 500));
+    final analysisState = ref.read(analysisNotifierProvider);
+    final score = analysisState.result?.score ?? 75;
+    final goalZone = analysisState.result?.goalZone;
+    final breakdown = analysisState.result?.breakdown ?? {};
+
+    final sessionService = ref.read(sessionServiceProvider);
+    return sessionService.saveAnalysis(
+      uid: uid,
+      mode: _mode == RecordingMode.player
+          ? SessionMode.player
+          : SessionMode.goalie,
+      durationSeconds: durationSeconds,
+      overallScore: score,
+      goalZone: goalZone,
+      breakdown: breakdown,
+    );
+  }
+
+  Future<_ShotTypeSelection?> _showShotTypePicker(BuildContext ctx) {
+    return showModalBottomSheet<_ShotTypeSelection>(
+      context: ctx,
+      isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => const _ShotTypePickerSheet(),
+    );
   }
 
   String get _formattedTime {
@@ -329,6 +392,139 @@ class _ModeButton extends StatelessWidget {
             color: selected ? Colors.white : Colors.white70,
             fontWeight: selected ? FontWeight.bold : FontWeight.normal,
             fontSize: 15,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Shot type picker
+// ---------------------------------------------------------------------------
+
+class _ShotTypeSelection {
+  final LacrosseDiscipline discipline;
+  final ShotType? shotType;
+  const _ShotTypeSelection({required this.discipline, this.shotType});
+}
+
+class _ShotTypePickerSheet extends StatefulWidget {
+  const _ShotTypePickerSheet();
+
+  @override
+  State<_ShotTypePickerSheet> createState() => _ShotTypePickerSheetState();
+}
+
+class _ShotTypePickerSheetState extends State<_ShotTypePickerSheet> {
+  LacrosseDiscipline _discipline = LacrosseDiscipline.mens;
+
+  @override
+  Widget build(BuildContext context) {
+    final shots = shotsForDiscipline(_discipline);
+    return DraggableScrollableSheet(
+      initialChildSize: 0.55,
+      minChildSize: 0.35,
+      maxChildSize: 0.85,
+      expand: false,
+      builder: (_, scrollController) => Column(
+        children: [
+          // Handle
+          Container(
+            margin: const EdgeInsets.only(top: 12, bottom: 8),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const Text(
+            'What type of shot?',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 8),
+          // Discipline toggle
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _PillButton(
+                label: "Men's",
+                selected: _discipline == LacrosseDiscipline.mens,
+                onTap: () => setState(() => _discipline = LacrosseDiscipline.mens),
+              ),
+              const SizedBox(width: 8),
+              _PillButton(
+                label: "Women's",
+                selected: _discipline == LacrosseDiscipline.womens,
+                onTap: () => setState(() => _discipline = LacrosseDiscipline.womens),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Skip button
+          TextButton(
+            onPressed: () => Navigator.pop(
+              context,
+              _ShotTypeSelection(discipline: _discipline),
+            ),
+            child: const Text('Skip — auto detect later'),
+          ),
+          const Divider(height: 1),
+          // Shot list
+          Expanded(
+            child: ListView.builder(
+              controller: scrollController,
+              itemCount: shots.length,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              itemBuilder: (_, i) {
+                final s = shots[i];
+                return ListTile(
+                  title: Text(s.displayName,
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                  subtitle: Text(s.quickCue,
+                      style: TextStyle(
+                          fontSize: 12, color: Colors.grey.shade600)),
+                  trailing: const Icon(Icons.chevron_right, size: 20),
+                  contentPadding: EdgeInsets.zero,
+                  onTap: () => Navigator.pop(
+                    context,
+                    _ShotTypeSelection(
+                      discipline: _discipline,
+                      shotType: s.type,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PillButton extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  const _PillButton({required this.label, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.primary : Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? Colors.white : Colors.black87,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.normal,
           ),
         ),
       ),

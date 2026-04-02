@@ -6,6 +6,7 @@ import '../../../core/constants/app_routes.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../providers/ml_provider.dart';
 import '../../../data/services/ml_analysis_service.dart';
+import '../../../data/services/shot_coaching_service.dart';
 
 class ResultsScreen extends ConsumerWidget {
   final String sessionId;
@@ -92,7 +93,11 @@ class ResultsScreen extends ConsumerWidget {
 
           // ── Results (real or placeholder) ──────────────────────────
           final result = analysisState.result ?? _placeholderResult();
-          return _ResultsBody(result: result, categoryIcons: _categoryIcons);
+          return _ResultsBody(
+            result: result,
+            categoryIcons: _categoryIcons,
+            coachingReport: analysisState.coachingReport,
+          );
         },
       ),
     );
@@ -115,8 +120,13 @@ class ResultsScreen extends ConsumerWidget {
 class _ResultsBody extends StatelessWidget {
   final ShotAnalysisResult result;
   final Map<String, String> categoryIcons;
+  final ShotCoachingReport? coachingReport;
 
-  const _ResultsBody({required this.result, required this.categoryIcons});
+  const _ResultsBody({
+    required this.result,
+    required this.categoryIcons,
+    this.coachingReport,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -128,6 +138,44 @@ class _ResultsBody extends StatelessWidget {
           // Score ring
           _ScoreRing(score: result.score.toDouble()),
           const SizedBox(height: AppSizes.lg),
+
+          // Shot type label (from coaching report)
+          if (coachingReport != null) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSizes.md,
+                vertical: AppSizes.sm,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+              ),
+              child: Row(
+                children: [
+                  const Text('🥍', style: TextStyle(fontSize: 22)),
+                  const SizedBox(width: AppSizes.sm),
+                  Text(
+                    coachingReport!.shotLabel,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    coachingReport!.discipline.name.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSizes.lg),
+          ],
 
           // Breakdown cards
           const Text(
@@ -145,8 +193,49 @@ class _ResultsBody extends StatelessWidget {
 
           const SizedBox(height: AppSizes.lg),
 
-          // Coaching tip
-          _CoachingTip(tip: result.tip),
+          // Strengths
+          if (coachingReport != null &&
+              coachingReport!.strengths.isNotEmpty) ...[
+            const Text(
+              'Your Strengths',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: AppSizes.sm),
+            ...coachingReport!.strengths.map(
+              (s) => Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  children: [
+                    const Text('✅', style: TextStyle(fontSize: 16)),
+                    const SizedBox(width: AppSizes.sm),
+                    Expanded(
+                      child: Text(s,
+                          style: const TextStyle(fontSize: 14)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSizes.lg),
+          ],
+
+          // Coaching tips (from coaching report, or fallback to single tip)
+          if (coachingReport != null &&
+              coachingReport!.tips.isNotEmpty) ...[
+            const Text(
+              'Coaching Tips',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: AppSizes.sm),
+            ...coachingReport!.tips.take(3).map(
+                  (tip) => _CoachingTipCard(tip: tip),
+                ),
+            const SizedBox(height: AppSizes.sm),
+            // Quick cue
+            _CoachingTip(tip: coachingReport!.quickCue),
+          ] else ...[
+            _CoachingTip(tip: result.tip),
+          ],
 
           const SizedBox(height: AppSizes.lg),
 
@@ -174,6 +263,65 @@ class _ResultsBody extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSizes.xl),
+        ],
+      ),
+    );
+  }
+}
+
+class _CoachingTipCard extends StatelessWidget {
+  final CoachingTip tip;
+  const _CoachingTipCard({required this.tip});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSizes.sm),
+      padding: const EdgeInsets.all(AppSizes.md),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: tip.priority <= 1
+                      ? Colors.redAccent.withValues(alpha: 0.15)
+                      : AppColors.accent.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  '#${tip.priority}',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: tip.priority <= 1 ? Colors.redAccent : AppColors.accent,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSizes.sm),
+              Expanded(
+                child: Text(
+                  tip.headline,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            tip.detail,
+            style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+          ),
         ],
       ),
     );

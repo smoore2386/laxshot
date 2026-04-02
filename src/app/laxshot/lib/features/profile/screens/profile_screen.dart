@@ -5,8 +5,8 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../data/models/user_model.dart';
+import '../../../data/repositories/user_repository.dart';
 import '../../auth/providers/auth_provider.dart';
-import '../../../data/services/auth_service.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -76,7 +76,14 @@ class ProfileScreen extends ConsumerWidget {
                           label: 'Player',
                           subtitle: 'Shot analysis',
                           selected: !isGoalie,
-                          onTap: () {/* update profile */},
+                          onTap: () {
+                            if (user != null) {
+                              ref.read(userRepositoryProvider).updateUser(
+                                user.uid,
+                                {'position': PlayerPosition.attacker.name},
+                              );
+                            }
+                          },
                         ),
                       ),
                       Expanded(
@@ -85,7 +92,14 @@ class ProfileScreen extends ConsumerWidget {
                           label: 'Goalie',
                           subtitle: 'Save analysis',
                           selected: isGoalie,
-                          onTap: () {/* update profile */},
+                          onTap: () {
+                            if (user != null) {
+                              ref.read(userRepositoryProvider).updateUser(
+                                user.uid,
+                                {'position': PlayerPosition.goalie.name},
+                              );
+                            }
+                          },
                         ),
                       ),
                     ],
