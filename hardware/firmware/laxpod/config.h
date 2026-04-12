@@ -34,6 +34,9 @@
 
 // ─── LED Pins (XIAO nRF52840 Sense — active LOW) ─────────────────
 #define LED_RED_PIN           LED_RED
+#ifndef LED_GREEN
+#define LED_GREEN             14  // XIAO nRF52840 Sense green LED GPIO
+#endif
 #define LED_GREEN_PIN         LED_GREEN
 #define LED_BLUE_PIN          LED_BLUE
 

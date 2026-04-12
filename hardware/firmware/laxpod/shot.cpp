@@ -12,6 +12,25 @@ static float peakAccel = 0.0f;
 static unsigned long shotStartTime = 0;
 static unsigned long lastShotEndTime = 0;
 
+// Convert Euler angles (roll, pitch, yaw in degrees) to quaternion (w, x, y, z)
+static void eulerToQuaternion(float rollDeg, float pitchDeg, float yawDeg, float q[4]) {
+  float roll  = rollDeg  * 0.0174533f;  // deg to rad
+  float pitch = pitchDeg * 0.0174533f;
+  float yaw   = yawDeg   * 0.0174533f;
+
+  float cr = cosf(roll * 0.5f);
+  float sr = sinf(roll * 0.5f);
+  float cp = cosf(pitch * 0.5f);
+  float sp = sinf(pitch * 0.5f);
+  float cy = cosf(yaw * 0.5f);
+  float sy = sinf(yaw * 0.5f);
+
+  q[0] = cr * cp * cy + sr * sp * sy;  // w
+  q[1] = sr * cp * cy - cr * sp * sy;  // x
+  q[2] = cr * sp * cy + sr * cp * sy;  // y
+  q[3] = cr * cp * sy - sr * sp * cy;  // z
+}
+
 void shotInit(float sampleRateHz) {
   madgwick.begin(sampleRateHz);
   state = ShotState::IDLE;
@@ -30,11 +49,9 @@ bool shotUpdate(const ImuData& data) {
   // Always update Madgwick filter for continuous orientation tracking
   madgwick.updateIMU(data.gx, data.gy, data.gz, data.ax, data.ay, data.az);
 
-  // Store current quaternion
-  currentQuat[0] = madgwick.getQuatW();
-  currentQuat[1] = madgwick.getQuatX();
-  currentQuat[2] = madgwick.getQuatY();
-  currentQuat[3] = madgwick.getQuatZ();
+  // Compute quaternion from Madgwick Euler angles
+  eulerToQuaternion(madgwick.getRoll(), madgwick.getPitch(), madgwick.getYaw(),
+                    currentQuat);
 
   float accelMag = imuAccelMagnitude(data);
   unsigned long now = millis();

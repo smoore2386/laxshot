@@ -1,4 +1,4 @@
-#include "ble.h"
+#include "laxble.h"
 #include "config.h"
 
 // BLE Services and Characteristics
@@ -23,7 +23,7 @@ static void _connectCallback(uint16_t connHandle) {
   // Min 7.5ms, Max 15ms, latency 0, timeout 2s
   BLEConnection* conn = Bluefruit.Connection(connHandle);
   if (conn) {
-    conn->requestConnectionParameter(6, 12, 0, 200);  // units of 1.25ms
+    conn->requestConnectionParameter(12);  // 12 * 1.25ms = 15ms interval
   }
 
   if (bleOnConnect) bleOnConnect(connHandle);

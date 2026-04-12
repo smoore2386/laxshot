@@ -1,5 +1,5 @@
-#ifndef BLE_H
-#define BLE_H
+#ifndef LAXBLE_H
+#define LAXBLE_H
 
 #include <Arduino.h>
 #include <bluefruit.h>
@@ -30,4 +30,4 @@ void bleDisconnectAll();
 extern void (*bleOnConnect)(uint16_t connHandle);
 extern void (*bleOnDisconnect)(uint16_t connHandle, uint8_t reason);
 
-#endif // BLE_H
+#endif // LAXBLE_H

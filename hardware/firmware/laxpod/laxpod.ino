@@ -12,7 +12,7 @@
 #include <Arduino.h>
 #include "config.h"
 #include "imu.h"
-#include "ble.h"
+#include "laxble.h"
 #include "shot.h"
 #include "power.h"
 
