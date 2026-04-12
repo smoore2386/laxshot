@@ -1,9 +1,11 @@
 Item,Qty,Description,Unit Price,Total,Source,Notes
 Seeed XIAO nRF52840 Sense,5,"MCU + BLE 5.0 + LSM6DS3 IMU, 21x17.8mm",$15.99,$79.95,Seeed Studio,seeedstudio.com/Seeed-XIAO-BLE-Sense-nRF52840-p-5253.html
-300mAh 3.7V LiPo Battery,5,"402025 form, JST-PH 2.0mm, protected",$3.50,$17.50,Amazon/DigiKey,Must have JST-PH 2.0mm connector
-LaxPod Body - Men's 1in (SLA),3,"Rigid 10K resin, 0.05mm layers",$18.00,$54.00,Xometry,Upload STL
-LaxPod Body - Women's 7/8in (SLA),2,"Rigid 10K resin, 0.05mm layers",$18.00,$36.00,Xometry,Upload STL
-LaxPod Lid (SLA),5,"Rigid 10K resin, same lid fits both",$8.00,$40.00,Xometry,Upload STL
+300mAh 3.7V LiPo Battery (Men's),3,"402025 form (20x25x4mm), JST-PH 2.0mm, protected",$3.50,$10.50,Amazon/DigiKey,Must have JST-PH 2.0mm connector
+150mAh 3.7V LiPo Battery (Women's),2,"401730 form (~17x30x3.5mm), JST-PH 2.0mm, protected",$3.50,$7.00,Amazon/DigiKey,Narrower battery for women's shaft ID
+LaxPod Plug - Men's 1in (SLA),3,"Rigid 10K resin, 0.05mm layers, 21.5mm OD x 65mm",$15.00,$45.00,Xometry,Upload STL laxpod_plug_mens_1inch.stl
+LaxPod Plug - Women's 7/8in (SLA),2,"Rigid 10K resin, 0.05mm layers, 18.5mm OD x 65mm",$15.00,$30.00,Xometry,Upload STL laxpod_plug_womens_7_8inch.stl
+Nitrile O-Rings (Men's),1 pack (25pc),"~19mm ID x 1.5mm cross-section (AS568-010)",$5.99,$5.99,Amazon,2 per plug; 6 needed + spares
+Nitrile O-Rings (Women's),1 pack (25pc),"~16mm ID x 1.5mm cross-section (AS568-007)",$5.99,$5.99,Amazon,2 per plug; 4 needed + spares
 M1.6x4mm Screws,1 pack (50pc),"Pan head, Phillips",$5.99,$5.99,Amazon,For board standoff mounting
 M1.6 Hex Nuts,1 pack (50pc),Standard hex,$4.99,$4.99,Amazon,Pairs with M1.6 screws
 30AWG Silicone Wire,1 spool (25ft),"Red + black, flexible",$6.99,$6.99,Amazon,Battery wiring
@@ -12,4 +14,4 @@ Heat Shrink Tubing,1 kit,"Assorted sizes, 2:1 ratio",$5.99,$5.99,Amazon,Wire ins
 USB-C Data Cable,2,"Short, for flashing + charging",$7.99,$15.98,Amazon,
 Double-sided Foam Tape,1 roll,"1mm thick, 3M",$4.99,$4.99,Amazon,Battery retention in pocket
 ,,,,,,
-,,,TOTAL:,$280.38,,
+,,,TOTAL:,$237.35,,

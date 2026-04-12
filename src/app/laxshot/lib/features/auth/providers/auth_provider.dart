@@ -1,88 +1,30 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/services/auth_service.dart';
-import '../../../data/repositories/user_repository.dart';
-import '../../../data/models/user_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
-final authServiceProvider = Provider<AuthService>((ref) => AuthService());
+final authProvider = FutureProvider((ref) async {
+  final auth = FirebaseAuth.instance;
 
-final authStateProvider = StreamProvider<User?>((ref) {
-  return ref.watch(authServiceProvider).authStateChanges;
+  return auth.currentUser != null;
 });
 
-// Alias — used by stats/camera providers that just need the raw Firebase user
-final firebaseUserProvider = authStateProvider;
-
-final currentUserModelProvider = StreamProvider<UserModel?>((ref) {
-  final authState = ref.watch(authStateProvider);
-  return authState.when(
-    data: (user) {
-      if (user == null) return Stream.value(null);
-      return ref.watch(userRepositoryProvider).watchUser(user.uid);
-    },
-    loading: () => Stream.value(null),
-    error: (_, __) => Stream.value(null),
-  );
+final userStateChanges = StreamProvider((ref) {
+  return FirebaseAuth.instance.userChanges();
 });
 
-class AuthNotifier extends AsyncNotifier<void> {
-  @override
-  Future<void> build() async {}
+final userEmail = StreamProvider((ref) {
+  return FirebaseAuth.instance.userChanges().map((user) => user?.email);
+});
 
-  Future<void> signIn(String email, String password) async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(
-      () => ref.read(authServiceProvider).signInWithEmail(email, password),
-    );
-  }
+final userId = StreamProvider((ref) {
+  return FirebaseAuth.instance.userChanges().map((user) => user?.uid);
+});
 
-  Future<void> signUp({
-    required String email,
-    required String password,
-    required String displayName,
-    required DateTime dateOfBirth,
-    required PlayerPosition position,
-  }) async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      final cred = await ref
-          .read(authServiceProvider)
-          .createWithEmail(email, password);
-      await ref.read(userRepositoryProvider).createProfile(
-            uid: cred.user!.uid,
-            email: email,
-            displayName: displayName,
-            dateOfBirth: dateOfBirth,
-            position: position,
-          );
-    });
-  }
+final isLoggedIn = FutureProvider((ref) async {
+  final auth = FirebaseAuth.instance;
 
-  Future<void> signInWithGoogle() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(
-      () => ref.read(authServiceProvider).signInWithGoogle(),
-    );
-  }
-
-  Future<void> signInWithApple() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(
-      () => ref.read(authServiceProvider).signInWithApple(),
-    );
-  }
-
-  Future<void> signOut() async {
-    await ref.read(authServiceProvider).signOut();
-  }
-
-  Future<void> requestParentalConsent(String parentEmail) async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(
-      () => ref.read(userRepositoryProvider).requestParentalConsent(parentEmail),
-    );
-  }
-}
-
-final authNotifierProvider =
-    AsyncNotifierProvider<AuthNotifier, void>(AuthNotifier.new);
+  return auth.currentUser != null;
+});

@@ -121,7 +121,7 @@ class AppTheme {
 
       // Bottom nav
       navigationBarTheme: NavigationBarThemeData(
-        indicatorColor: AppColors.primary.withOpacity(0.15),
+        indicatorColor: AppColors.primary.withValues(alpha: 0.15),
         labelTextStyle: WidgetStateProperty.all(
           const TextStyle(fontSize: AppSizes.label, fontWeight: FontWeight.w600),
         ),

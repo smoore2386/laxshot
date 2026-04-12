@@ -48,7 +48,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     final now = DateTime.now();
     int age = now.year - _dob!.year;
     if (now.month < _dob!.month ||
-        (now.month == _dob!.month && now.day < _dob!.day)) age--;
+        (now.month == _dob!.month && now.day < _dob!.day)) { age--; }
     return age;
   }
 
@@ -199,7 +199,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             style: theme.textTheme.bodyLarge?.copyWith(
                               color: _dob != null
                                   ? null
-                                  : theme.colorScheme.onSurface.withOpacity(0.5),
+                                  : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                             ),
                           ),
                         ),
@@ -213,7 +213,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
                 // Position selector
                 DropdownButtonFormField<PlayerPosition>(
-                  value: _position,
+                  initialValue: _position,
                   decoration: const InputDecoration(
                     labelText: 'Position',
                     prefixIcon: Icon(Icons.sports_outlined),
@@ -286,7 +286,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   Container(
                     padding: const EdgeInsets.all(AppSizes.md),
                     decoration: BoxDecoration(
-                      color: AppColors.accent.withOpacity(0.15),
+                      color: AppColors.accent.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                       border: Border.all(color: AppColors.accent),
                     ),

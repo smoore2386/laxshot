@@ -71,9 +71,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               padding: const EdgeInsets.all(AppSizes.md),
               margin: const EdgeInsets.only(bottom: AppSizes.sm),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.06),
+                color: AppColors.primary.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [
@@ -100,7 +100,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             iconColor: Colors.orange,
             onTap: () async {
               await ref.read(authServiceProvider).signOut();
-              if (context.mounted) context.go(AppRoutes.login);
+              if (!mounted) return;
+              context.go(AppRoutes.login);
             },
           ),
           _ActionTile(
@@ -150,13 +151,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               Navigator.pop(context);
               try {
                 await ref.read(authServiceProvider).deleteAccount();
-                if (mounted) context.go(AppRoutes.login);
+                if (!mounted) return;
+                context.go(AppRoutes.login);
               } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to delete account: $e')),
-                  );
-                }
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Failed to delete account: $e')),
+                );
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -228,7 +229,7 @@ class _ToggleTile extends StatelessWidget {
               ],
             ),
           ),
-          Switch(value: value, onChanged: onChanged, activeColor: AppColors.primary),
+          Switch(value: value, onChanged: onChanged, activeThumbColor: AppColors.primary),
         ],
       ),
     );

@@ -7,10 +7,9 @@ import 'package:flutter/foundation.dart';
 class DevConfig {
   DevConfig._();
 
-  /// When true, the login screen shows a "Dev: Skip Login" button
-  /// that bypasses auth and navigates directly to the home screen.
-  /// ⚠️ Only active in debug builds. Never ships in release.
-  static const bool enableDevBypass = kDebugMode;
+  /// When true, the app bypasses auth and navigates directly to the home screen.
+  /// TODO: Set back to `kDebugMode` once real auth flow is needed.
+  static const bool enableDevBypass = true;
 
   /// Optional: pre-fill email/password on the login screen in debug mode
   /// to save typing during testing. Set to null to disable.

@@ -156,12 +156,13 @@ flutter analyze
 
 ## OpenClaw Agents
 
-Three AI agents collaborate on this project via [OpenClaw](https://docs.openclaw.ai):
+Four AI agents collaborate on this project via [OpenClaw](https://docs.openclaw.ai):
 
 | Agent | ID | Emoji | Role |
 |---|---|---|---|
 | **BackClaw** | `engineering-backend` | ⚙️ | API, database, server infrastructure |
 | **FrontClaw** | `engineering-frontend` | 🎨 | Mobile app, UI, components |
+| **LaxForge** | `hardware` | 🔧 | Sensor pod firmware, enclosure, BLE protocol |
 | **PitchClaw** | `marketing` | 📣 | Campaigns, copy, ASO, growth |
 
 ### Agent setup
@@ -179,6 +180,7 @@ openclaw gateway
 openclaw agent --message "What's the data model?"                              # → BackClaw (default)
 openclaw agent --agent marketing --message "Draft an App Store description"     # → PitchClaw
 openclaw agent --agent engineering-frontend --message "What screens exist?"     # → FrontClaw
+openclaw agent --agent hardware --message "What's the latest sensor protocol?"   # → LaxForge
 ```
 
 Agents can message each other using `sessions_send` (cross-agent messaging is enabled). Agent workspaces live in `.openclaw/workspace-*/`.

@@ -136,7 +136,7 @@ class _AgeGateScreenState extends ConsumerState<AgeGateScreen> {
               Text(
                 'Before we get started, let us know your birthday so we can set up your account correctly.',
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -185,7 +185,7 @@ class _AgeGateScreenState extends ConsumerState<AgeGateScreen> {
                                   color: dob != null
                                       ? null
                                       : theme.colorScheme.onSurface
-                                          .withOpacity(0.5),
+                                          .withValues(alpha: 0.5),
                                 ),
                               ),
                               const Spacer(),

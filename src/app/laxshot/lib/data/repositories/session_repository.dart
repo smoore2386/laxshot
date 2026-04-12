@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/session_model.dart';
-import '../models/stats_model.dart';
 
 final sessionRepositoryProvider = Provider<SessionRepository>((_) => SessionRepository());
 

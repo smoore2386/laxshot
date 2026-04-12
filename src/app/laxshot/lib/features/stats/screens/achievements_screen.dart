@@ -194,11 +194,11 @@ class _AchievementCard extends StatelessWidget {
           color: achievement.earned ? AppColors.surface : Colors.grey.shade100,
           borderRadius: BorderRadius.circular(AppSizes.radiusMd),
           border: Border.all(
-            color: achievement.earned ? AppColors.primary.withOpacity(0.3) : AppColors.border,
+            color: achievement.earned ? AppColors.primary.withValues(alpha: 0.3) : AppColors.border,
             width: achievement.earned ? 2 : 1,
           ),
           boxShadow: achievement.earned
-              ? [BoxShadow(color: AppColors.primary.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 2))]
+              ? [BoxShadow(color: AppColors.primary.withValues(alpha: 0.1), blurRadius: 8, offset: const Offset(0, 2))]
               : null,
         ),
         child: Column(

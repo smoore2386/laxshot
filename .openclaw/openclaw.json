@@ -130,7 +130,7 @@
   }, // end agents
 
   // ── Multi-agent routing ─────────────────────────────────────────────
-  // Route Discord channel to all three agents
+  // Route Discord channel to all four agents
   bindings: [
     // Backend agent (default for unmatched mentions)
     { agentId: "engineering-backend", match: { channel: "discord", peer: { kind: "channel", id: "1488224925956178080" } } },
@@ -159,7 +159,7 @@
       mode: "daily",
       atHour: 4,   // reset at 4 AM
     },
-    agentToAgent: { maxPingPongTurns: 8 },
+    agentToAgent: { maxPingPongTurns: 5 },
   },
 
   // ── Config hot reload ────────────────────────────────────────────────

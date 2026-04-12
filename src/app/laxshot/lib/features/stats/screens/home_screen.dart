@@ -93,7 +93,7 @@ class HomeScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(AppSizes.radiusLg),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.4),
+                          color: AppColors.primary.withValues(alpha: 0.4),
                           blurRadius: 16,
                           offset: const Offset(0, 6),
                         ),
@@ -129,6 +129,63 @@ class HomeScreen extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(28),
                           ),
                           child: const Icon(Icons.videocam_rounded, color: Colors.white, size: 28),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Sensor CTA
+                GestureDetector(
+                  onTap: () => context.push(AppRoutes.sensorScan),
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: AppSizes.lg),
+                    padding: const EdgeInsets.all(AppSizes.lg),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF0077B6), Color(0xFF023E8A)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF0077B6).withValues(alpha: 0.4),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Connect LaxPod',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Track shot mechanics with your sensor',
+                                style: TextStyle(color: Colors.white70, fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: Colors.white24,
+                            borderRadius: BorderRadius.circular(28),
+                          ),
+                          child: const Icon(Icons.bluetooth_searching, color: Colors.white, size: 28),
                         ),
                       ],
                     ),

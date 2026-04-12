@@ -2,38 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- ── Privacy usage descriptions (App Store required) ── -->
-	<key>NSCameraUsageDescription</key>
-	<string>LaxShot uses the camera to record and analyze your lacrosse shots and saves.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>LaxShot can save your session recordings to your photo library.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>LaxShot saves your session recordings to your photo library.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>LaxShot may capture audio during recording sessions.</string>
-
-	<!-- ── COPPA / under-13 compliance ── -->
-	<!-- ITSAppUsesNonExemptEncryption: false because we use HTTPS only (Apple standard networking) -->
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-
-	<!-- ── Google Sign-In: REVERSED_CLIENT_ID URL scheme ── -->
-	<!-- Replace REPLACE_WITH_REVERSED_CLIENT_ID with the value from GoogleService-Info.plist -->
-	<!-- Download GoogleService-Info.plist from: https://console.firebase.google.com/project/laxshot-app-d44c9/settings/general/ios -->
-	<!-- Then copy the REVERSED_CLIENT_ID value and replace the placeholder below -->
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>com.googleusercontent.apps.138884416580-vjtcu5vak8st23dp7l2aphhg3h6fagcn</string>
-			</array>
-		</dict>
-	</array>
-
-	<!-- ── Performance ── -->
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -54,10 +22,35 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.138884416580-vjtcu5vak8st23dp7l2aphhg3h6fagcn</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>LaxShot connects to your LaxPod sensor to track shot mechanics in real time.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>LaxShot connects to your LaxPod sensor to track shot mechanics in real time.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>LaxShot uses the camera to record and analyze your lacrosse shots and saves.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>LaxShot may capture audio during recording sessions.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>LaxShot saves your session recordings to your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>LaxShot can save your session recordings to your photo library.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -72,7 +65,7 @@
 					<key>UISceneConfigurationName</key>
 					<string>flutter</string>
 					<key>UISceneDelegateClassName</key>
-					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+					<string>FlutterSceneDelegate</string>
 					<key>UISceneStoryboardFile</key>
 					<string>Main</string>
 				</dict>

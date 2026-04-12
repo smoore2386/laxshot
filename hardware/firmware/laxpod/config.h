@@ -2,8 +2,8 @@
 #define CONFIG_H
 
 // ─── Shaft & Enclosure Specs ───────────────────────────────────────
-// Men's bore: 1.000" OD, Women's bore: 0.875" OD
-// Pod length: 1.6", Max OD: 1.25", Wall: 0.125"
+// Plug inserts inside shaft: Men's shaft OD 1.000", Women's shaft OD 0.875"
+// Plug: Men's 21.5mm OD × 65mm, Women's 18.5mm OD × 65mm
 
 // ─── BLE Configuration ────────────────────────────────────────────
 // Custom base UUID: 4C415800-5348-4F54-4C41-585353454E53

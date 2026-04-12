@@ -11,7 +11,8 @@ Step-by-step assembly instructions for building one LaxPod unit. Repeat for all 
 ## Before You Start
 
 - [ ] Firmware is compiled and verified (see `firmware/README.md`)
-- [ ] Enclosure body + lid are printed and post-cured
+- [ ] Enclosure plug is printed and post-cured (see `enclosure/print_settings.md`)
+- [ ] O-rings for your shaft size are on hand (2 per plug)
 - [ ] All BOM items received
 
 ---
@@ -65,67 +66,79 @@ Step-by-step assembly instructions for building one LaxPod unit. Repeat for all 
 
 ## Step 4: Mount Board in Enclosure
 
-1. Place the enclosure body **bore-side down** on the table (opening facing up)
-2. Drop in 4× M1.6 screws through the standoff holes (from inside)
-3. Place the XIAO board on the standoffs, aligning the 4 mounting holes:
-   - USB-C port should face **toward the lid** (top)
-   - IMU chip faces up
-4. Thread M1.6 nuts onto the screws from the bottom side of the board
-5. Finger-tighten — don't overtorque (the resin standoffs are small)
+1. Hold the enclosure plug with the **open end facing up** (endcap face down)
+2. Slide the XIAO board into the **rail cradle** inside the plug:
+   - The board slides between the two parallel rails like a card in a slot
+   - **USB-C port faces down** toward the endcap
+   - Push until the board contacts the retaining lip
+3. Align the 4 mounting holes with the M1.6 standoff bosses on the endcap floor
+4. Thread **M1.6×4mm screws** through the board holes into the standoff bosses
+5. Finger-tighten — don't overtorque (the resin bosses are small)
 
-**Alternative (no screws):** Use a small dot of hot glue on each standoff. The pod doesn't experience sustained force on the board.
+**Alternative (no screws):** The rail cradle holds the board in position. A small dot of hot glue on the standoffs adds security without screws.
 
 ---
 
 ## Step 5: Install Battery
 
-1. Place a small piece of **double-sided foam tape** in the battery pocket
-2. Press the LiPo cell into the pocket — it should sit flat
+1. Place a small piece of **double-sided foam tape** in the battery pocket (above the XIAO bay)
+2. Press the LiPo cell into the pocket — it should sit flat:
+   - **Men's units:** use 402025 battery (300mAh, 20×25×4mm)
+   - **Women's units:** use 401730 battery (~150mAh, 17×30×3.5mm)
 3. Route the JST wire along the wire channel to the XIAO connector
 4. Tuck any excess wire length beside the battery
-5. Ensure no wires are pinched between the board and enclosure walls
+5. Ensure no wires are pinched between the board and plug walls
 
 ---
 
-## Step 6: Snap Lid
+## Step 6: Install O-Rings
 
-1. Orient the lid so the **button hole aligns** with the XIAO's onboard button
-2. The **LED window** should align with the RGB LED area
-3. Press the lid down firmly until the **4 snap hooks click** into place
-4. Verify the lid is flush and doesn't wobble
-5. Press the button through the hole — confirm you can feel the click
+1. Locate the **2 circumferential grooves** near the open end (insertion end) of the plug
+2. Stretch an O-ring and seat it into the **first groove** (closest to the open end):
+   - **Men's:** ~19mm ID × 1.5mm cross-section
+   - **Women's:** ~16mm ID × 1.5mm cross-section
+3. Repeat for the **second groove**
+4. Verify both O-rings sit flush in their grooves — they should protrude ~0.5mm above the plug surface
+5. The O-rings should not easily roll out of the grooves when handled
 
 ---
 
-## Step 7: Test Fit on Shaft
+## Step 7: Insert Plug into Shaft
 
-1. Remove the stock butt cap from your lacrosse shaft (pull or twist off)
-2. Slide the LaxPod onto the bare shaft end
-3. **Men's version:** Should grip a 1.000" OD shaft snugly
-4. **Women's version:** Should grip a 0.875" OD shaft snugly
+1. Remove the stock butt-end cap from your lacrosse shaft (pull or twist off)
+2. **Orient the plug** with the endcap face (button/LED holes) facing outward (toward you)
+3. Push the plug **into the open butt end** of the shaft:
+   - The O-rings compress against the shaft interior wall
+   - Push until the endcap face is **flush with the shaft end**
+4. **Men's version:** fits shafts with ~22mm+ internal diameter (1.000" OD shafts)
+5. **Women's version:** fits shafts with ~19mm+ internal diameter (0.875" OD shafts)
 
 ### Fit Checks:
-- [ ] Pod slides on with moderate force (not too easy, not impossible)
-- [ ] Pod doesn't fall off when you hold the stick horizontally
-- [ ] Pod doesn't fall off when you shake the stick vertically (butt-end down)
-- [ ] Pod doesn't rotate freely on the shaft
-- [ ] Pod sits flush — no gap between pod and shaft tape
+- [ ] Plug slides in with moderate force (O-rings grip but don't require excessive push)
+- [ ] Plug doesn't fall out when you hold the stick vertically (butt-end down)
+- [ ] Plug doesn't fall out when you shake the stick aggressively
+- [ ] Plug doesn't rotate freely inside the shaft
+- [ ] Endcap face is flush with (or slightly recessed from) the shaft end
+- [ ] Button and LED holes are accessible from the butt end
 
 ### If too loose:
-- Wrap 1–2 layers of electrical tape on the shaft where the ribs contact
-- Or print with 0.02" tighter bore diameter
+- Try the next size up O-ring cross-section (e.g., 2.0mm instead of 1.5mm)
+- Wrap a thin layer of PTFE tape around the plug body between the O-ring grooves
+- For octagonal or concave shafts: the O-rings naturally compress into the profile gaps
 
 ### If too tight:
-- Sand the grip ribs lightly with 400-grit sandpaper
-- Or file ribs down 0.01–0.02"
+- Lightly sand the plug exterior with 400-grit sandpaper
+- Or use thinner O-rings (1.0mm cross-section)
+- Check that no support nubs remain on the plug surface from printing
 
 ---
 
 ## Step 8: Final Verification
 
 1. Power on (should auto-start when battery is connected)
-2. Confirm blue LED visible through lid window (advertising)
-3. Connect via nRF Connect app → verify all 3 services visible:
+2. Confirm blue LED visible through **endcap face** LED window (advertising)
+3. Press the button through the **endcap face** button hole — confirm you can feel the click
+4. Connect via nRF Connect app → verify all 3 services visible:
    - Motion Service (4C415801...)
    - Device Information (0x180A)
    - Battery Service (0x180F)
@@ -163,8 +176,25 @@ USB-C ──►│ [USB]    [IMU]   │
          ┌──┴───────┴───────┐
          │  300mAh LiPo     │
          │  3.7V 402025     │
-         │  (JST-PH 2.0)   │
+         │  (JST-PH 2.0)   │  ← Men's units (M1–M3)
+         └──────────────────┘
+              ─ OR ─
+         ┌──────────────────┐
+         │  150mAh LiPo     │
+         │  3.7V 401730     │
+         │  (JST-PH 2.0)   │  ← Women's units (W1–W2)
          └──────────────────┘
 ```
 
 No external wiring beyond the battery connection. The IMU is onboard the XIAO Sense variant.
+
+---
+
+## Removing the Plug for Charging
+
+To charge or flash firmware, the plug must be removed from the shaft:
+
+1. Grip the exposed endcap face and **pull firmly** — the O-rings will release
+2. If difficult to grip, use a small flat tool (coin, butter knife) to pry at the shaft edge
+3. Connect USB-C to the XIAO port (accessible with plug removed)
+4. When done, push the plug back into the shaft until flush

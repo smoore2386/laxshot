@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -16,6 +15,10 @@ import '../features/stats/screens/stats_dashboard_screen.dart';
 import '../features/stats/screens/achievements_screen.dart';
 import '../features/profile/screens/profile_screen.dart';
 import '../features/profile/screens/settings_screen.dart';
+import '../features/sensor/screens/sensor_scan_screen.dart';
+import '../features/sensor/screens/sensor_live_screen.dart';
+import '../features/sensor/screens/sensor_session_summary_screen.dart';
+import '../features/sensor/screens/shot_replay_screen.dart';
 import '../features/stats/screens/home_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -33,7 +36,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final path = state.uri.path;
 
       // Dev bypass: skip auth entirely in debug builds
-      if (kDebugMode && DevConfig.enableDevBypass && path == AppRoutes.devBypass) {
+      if (DevConfig.enableDevBypass && path == AppRoutes.devBypass) {
         return AppRoutes.home;
       }
 
@@ -43,13 +46,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         AppRoutes.parentalConsent,
         AppRoutes.login,
         AppRoutes.signup,
-        if (kDebugMode) AppRoutes.devBypass,
+        if (DevConfig.enableDevBypass) AppRoutes.devBypass,
       ];
 
       if (!isAuthenticated) {
-        // Dev bypass: allow any navigation in debug mode when bypass is enabled
-        if (kDebugMode && DevConfig.enableDevBypass) return null;
-
+        // Dev bypass: allow all navigation in debug mode
+        if (DevConfig.enableDevBypass) {
+          // Skip login entirely — go straight to home
+          if (path == AppRoutes.root || path == AppRoutes.login) {
+            return AppRoutes.home;
+          }
+          return null;
+        }
         if (publicRoutes.any((r) => path.startsWith(r.split(':').first))) {
           return null;
         }
@@ -80,7 +88,9 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: AppRoutes.root,
-        builder: (_, __) => const SizedBox.shrink(),
+        builder: (_, __) => const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
       ),
       GoRoute(
         path: AppRoutes.onboarding,
@@ -129,6 +139,34 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.settings,
         builder: (_, __) => const SettingsScreen(),
       ),
+      GoRoute(
+        path: AppRoutes.sensorScan,
+        builder: (_, __) => const SensorScanScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.sensorLive,
+        builder: (_, __) => const SensorLiveScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.sensorSummary,
+        builder: (_, __) => const SensorSessionSummaryScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.shotReplay,
+        builder: (context, state) {
+          final shotIndex =
+              int.tryParse(state.pathParameters['shotIndex'] ?? '0') ?? 0;
+          return ShotReplayScreen(shotIndex: shotIndex);
+        },
+      ),
+      // Dev-only bypass route — redirect intercepts this before the builder runs
+      if (DevConfig.enableDevBypass)
+        GoRoute(
+          path: AppRoutes.devBypass,
+          builder: (_, __) => const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          ),
+        ),
     ],
     errorBuilder: (context, state) => Scaffold(
       body: Center(

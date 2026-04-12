@@ -28,12 +28,12 @@
 │  └─────────────────────────────────────┘   │
 │                                             │
 │  ┌─────────┐  ┌──────┐  ┌────────────┐    │
-│  │ RGB LED │  │Button│  │ Snap-fit   │    │
-│  │ Status  │  │ Pair │  │ Lid        │    │
+│  │ RGB LED │  │Button│  │ O-ring     │    │
+│  │ Status  │  │ Pair │  │ Grip       │    │
 │  └─────────┘  └──────┘  └────────────┘    │
 │                                             │
 │  Enclosure: SLA Rigid 10K Resin            │
-│  1.6" L × 1.25" OD, friction-fit bore     │
+│  65mm L × 21.5mm OD plug (inside shaft)   │
 └─────────────────────────────────────────────┘
           │
           │  BLE 5.0 (~30m range)
@@ -91,25 +91,113 @@
 - Standby (advertising): ~25 days
 - Deep sleep: ~years (negligible drain)
 
-## Enclosure Cross-Section
+## Enclosure Cross-Section (Plug Inside Shaft)
 
 ```
-         ┌─────────────┐ ← Snap-fit lid (0.15" deep)
-         │ [BTN] [LED] │ ← Button hole (3mm) + LED window (4mm)
-         ├─────────────┤
-         │             │
-         │   [XIAO]    │ ← Board on M1.6 standoffs (0.1" tall)
-         │             │
-         │   [LiPo]    │ ← Battery pocket (22×19×4mm)
-         │             │
-    ┌────┤             ├────┐
-    │ RR │             │ RR │ ← Grip ribs (0.05"×0.08"×0.30")
-    │ II │             │ II │
-    │ BB │             │ BB │
-    │ SS │             │ SS │
-    └────┼─────────────┼────┘
-         │     ↕       │
-         │  SHAFT      │ ← Lacrosse shaft inserts here
-         │  BORE       │   Men's: 1.000" / Women's: 0.875"
-         └─────────────┘
+    ┌──────────────────────────────────┐
+    │          LACROSSE SHAFT          │ ← Shaft wall (aluminum/carbon)
+    │  ┌────────────────────────────┐  │
+    │  │ ╔══╗              ╔══╗    │  │ ← O-ring grooves (×2)
+    │  │ ║OR║              ║OR║    │  │   1.5mm wide × 1.0mm deep
+    │  │ ╚══╝              ╚══╝    │  │
+    │  │                           │  │
+    │  │     [    LiPo    ]        │  │ ← Battery pocket
+    │  │     [ 402025/401730 ]     │  │   Men's: 20×25×4mm
+    │  │                           │  │   Women's: 17×30×3.5mm
+    │  │     ┌────────────┐        │  │
+    │  │     │   XIAO     │        │  │ ← Board on rail cradle
+    │  │     │ nRF52840   │        │  │   17.8mm wide, M1.6 standoffs
+    │  │     │  Sense     │        │  │
+    │  │     └────────────┘        │  │
+    │  │  ┌──────────────────────┐ │  │
+    │  │  │  [BTN]    [LED]     │ │  │ ← Endcap face (visible)
+    │  └──┴──────────────────────┴─┘  │   3mm button + 4mm LED window
+    │        ↑ Butt end of stick      │   1mm dome, flush with shaft end
+    └──────────────────────────────────┘
+
+    Plug OD: Men's 21.5mm / Women's 18.5mm
+    Shaft ID: Men's ~22mm / Women's ~19mm
+    Total plug length: ~65mm (~2.56")
 ```
+
+## Phase 2 Architecture (Custom 18×12mm PCB)
+
+Phase 2 replaces the off-the-shelf XIAO nRF52840 Sense with a custom 18×12mm PCB. The core circuit is identical (nRF52840 + IMU + LiPo charger) but smaller and cheaper at scale.
+
+### Phase 2 Block Diagram
+
+```
+┌─────────────────────────────────────────────┐
+│           LaxPod Sensor Pod (v2)            │
+│                                             │
+│  ┌──────────────────────────────────────┐   │
+│  │     Custom PCB (18 × 12mm)          │   │
+│  │                                      │   │
+│  │  ┌───────────┐  ┌──────────────┐    │   │
+│  │  │ BM840P    │  │ LSM6DSV16X   │    │   │
+│  │  │ nRF52840  │◄►│  IMU (I2C)   │    │   │
+│  │  │ module    │  │ ±16g / ±2000°│    │   │
+│  │  │           │  └──────────────┘    │   │
+│  │  │ BLE 5.4   │                      │   │
+│  │  │ +8dBm     │  ┌──────────────┐    │   │
+│  │  │ antenna   │  │  BQ25101     │    │   │
+│  │  │ (built-in)│◄─│  Charger IC  │    │   │
+│  │  └───────────┘  └──────┬───────┘    │   │
+│  │                        │            │   │
+│  │  [SWD pads] [Charge pogo pads]      │   │
+│  └────────────────────────┼────────────┘   │
+│                           │                │
+│  ┌────────────────────────┼────────────┐   │
+│  │    300mAh 3.7V LiPo   │            │   │
+│  │    (402025 — both sizes)◄──┘        │   │
+│  └─────────────────────────────────────┘   │
+│                                             │
+│  ┌─────────┐  ┌────────────────────────┐   │
+│  │ Status  │  │ O-ring Grip            │   │
+│  │ LED     │  │ (2× grooves)           │   │
+│  └─────────┘  └────────────────────────┘   │
+│                                             │
+│  Enclosure: SLA or injection-molded        │
+│  50mm L × 21.5/18.5mm OD plug             │
+└─────────────────────────────────────────────┘
+```
+
+### Phase 2 Cross-Section
+
+```
+    ┌──────────────────────────────────┐
+    │          LACROSSE SHAFT          │ ← Shaft wall
+    │  ┌────────────────────────────┐  │
+    │  │ ╔══╗              ╔══╗    │  │ ← O-ring grooves (×2)
+    │  │ ║OR║              ║OR║    │  │
+    │  │ ╚══╝              ╚══╝    │  │
+    │  │                           │  │
+    │  │     [   402025   ]        │  │ ← 300mAh battery (both sizes)
+    │  │     [   LiPo     ]        │  │   20×25×4mm — stacked above board
+    │  │                           │  │
+    │  │       ┌────────┐          │  │
+    │  │       │ Custom │          │  │ ← 18×12mm custom PCB
+    │  │       │  PCB   │          │  │   M1.2 standoffs
+    │  │       └────────┘          │  │
+    │  │  ┌──────────────────────┐ │  │
+    │  │  │ [CHG pads] [LED]    │ │  │ ← Endcap face (visible)
+    │  └──┴──────────────────────┴─┘  │   Pogo charge pads + LED window
+    │        ↑ Butt end of stick      │   Flush with shaft end
+    └──────────────────────────────────┘
+
+    Total plug length: ~50mm (~1.97")
+    Board: 18×12mm (vs 21×17.8mm XIAO)
+```
+
+### Phase Comparison
+
+| | Phase 1 | Phase 2 |
+|---|---|---|
+| **Board** | XIAO nRF52840 Sense (21×17.8mm) | Custom PCB (18×12mm) |
+| **IMU** | LSM6DS3 | LSM6DSV16X |
+| **BLE** | 5.0 | 5.4 (BM840P module) |
+| **Charging** | USB-C (remove plug from shaft) | Pogo pads through endcap |
+| **Plug length** | 65mm | 50mm |
+| **Women's battery** | 401730 (150mAh, ~8-12hr) | 402025 (300mAh, 20+hr) — same as men's |
+| **Unit cost (100 qty)** | ~$35/unit | ~$17.50/unit |
+| **Firmware** | Arduino/PlatformIO | Same, with IMU driver + pin mapping changes |

@@ -14,7 +14,14 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String settings = '/settings';
 
+  // Sensor (BLE LaxPod)
+  static const String sensorScan = '/sensor/scan';
+  static const String sensorLive = '/sensor/live';
+  static const String sensorSummary = '/sensor/summary';
+  static const String shotReplay = '/sensor/replay/:shotIndex';
+
   static String resultsPath(String sessionId) => '/results/$sessionId';
+  static String shotReplayPath(int shotIndex) => '/sensor/replay/$shotIndex';
 
   /// Dev-only bypass route — navigates straight to home without auth.
   /// Only reachable in debug builds.

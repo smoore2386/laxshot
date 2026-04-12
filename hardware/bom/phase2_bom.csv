@@ -1,0 +1,19 @@
+Item,Qty Per Board,Description / Specs,Unit Price (100 qty),Total (100 boards),Source,Notes
+Fanstel BM840P nRF52840 Module,1,"Pre-certified BLE 5.4, 10.2x15.1mm, includes crystal + antenna",$4.80,$480,LCSC,FCC/CE/IC pre-certified
+LSM6DSV16XTR IMU,1,"6-axis, ±16g accel, ±2000°/s gyro, I2C/SPI, 2.5x3x0.83mm",$1.95,$195,LCSC,Upgrade from LSM6DS3
+BQ25101 LiPo Charger IC,1,"1A charge, NTC, power path, SOT-23-6",$0.65,$65,LCSC,Same IC as XIAO reference
+32.768 kHz Crystal,1,"SMD 2-pad, 12.5 pF load",$0.12,$12,LCSC,Skip if BM840P includes RTC crystal
+Load Capacitors (12 pF),2,"0402, C0G/NP0",$0.12,$24,LCSC,For 32.768 kHz crystal
+Passives (resistors/caps/inductors),~15,"0402/0603, 1% resistors, MLCC caps, ferrite beads",$0.05 avg,$75,LCSC,Decoupling + power + signal
+Status LED,1,"0603 RGB or single-color",$0.08,$8,LCSC,
+PCB Fabrication,1,"18x12mm, 2-layer, ENIG, 1.0mm thick",$1.80,$180,JLCPCB,
+SMT Assembly Fee,1,"Pick-and-place, both sides",$2.50,$250,JLCPCB,
+,,,,,,
+,,,SUBTOTAL (assembled PCB):,$12.47,$1289,,
+,,,,,,
+300mAh 3.7V LiPo Battery,1,"402025 form (20x25x4mm), JST-PH 2.0mm or bare leads",$3.10,$310,DigiKey/LCSC,Same battery for men's + women's
+LaxPod Plug Enclosure,1,"ABS/Nylon, injection molded or SLA, men's/women's variant",$1.75,$175,JLCPCB 3D / mold vendor,~$1.50-2.00 range
+Nitrile O-Rings,2,"1.5mm cross-section, sized per shaft variant",$0.05,$10,LCSC/Amazon,
+Pogo Pin Charge Cable (amortized),0.1,"1 cable per ~10 units",$0.20,$20,AliExpress,
+,,,,,,
+,,,TOTAL PER UNIT:,~$17.57,$1804,,

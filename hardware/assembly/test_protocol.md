@@ -16,7 +16,7 @@ Run this protocol on each assembled pod before marking it "ready for beta."
 | Step | Expected | Pass? |
 |------|----------|-------|
 | Connect battery (or press reset) | Serial output shows firmware version | ☐ |
-| Observe LED | Blue LED visible through lid window | ☐ |
+| Observe LED | Blue LED visible through endcap face window | ☐ |
 | Check serial | `[IMU] Initialized` + `[BLE] Advertising started` printed | ☐ |
 
 **Fail action:** Check battery polarity, verify firmware was flashed, check solder joints.
@@ -113,13 +113,15 @@ Run this protocol on each assembled pod before marking it "ready for beta."
 
 | Step | Expected | Pass? |
 |------|----------|-------|
-| Remove stock butt cap from stick | Bare shaft end exposed | ☐ |
-| Slide LaxPod onto shaft | Goes on with moderate push force | ☐ |
-| Hold stick horizontally | Pod stays on (no sliding off) | ☐ |
-| Shake stick vertically (butt down) | Pod stays secure | ☐ |
-| Twist pod on shaft | Doesn't rotate freely | ☐ |
-| Remove pod | Pulls off with moderate force | ☐ |
-| Check pod for damage after removal | No cracks, chips, or deformation | ☐ |
+| Remove stock butt-end cap from stick | Bare shaft end exposed | ☐ |
+| Seat O-rings in plug grooves | 2 O-rings seated, ~0.5mm proud | ☐ |
+| Push LaxPod plug into shaft butt end | Goes in with moderate push force | ☐ |
+| Endcap face flush with shaft end | No protrusion or deep recess | ☐ |
+| Hold stick vertically (butt down) | Plug stays secure (no falling out) | ☐ |
+| Shake stick aggressively | Plug stays secure | ☐ |
+| Twist plug inside shaft | Doesn't rotate freely | ☐ |
+| Pull plug out | Removes with moderate force | ☐ |
+| Check plug for damage after removal | No cracks, chips, or deformation | ☐ |
 
 **Fail action:** See assembly guide fit adjustment section (tape for loose, sanding for tight).
 
@@ -129,12 +131,12 @@ Run this protocol on each assembled pod before marking it "ready for beta."
 
 | Step | Expected | Pass? |
 |------|----------|-------|
-| Mount pod on stick, connect via BLE | Connected + streaming | ☐ |
+| Mount plug in stick, connect via BLE | Connected + streaming | ☐ |
 | Execute 5 overhand shots | All 5 shots detected, data captured | ☐ |
 | Execute 5 sidearm shots | All 5 shots detected | ☐ |
 | Execute 5 underhand shots | At least 3 detected (lower accel) | ☐ |
 | Cradle and run (not shooting) | No false shot triggers | ☐ |
-| Check pod after 15 shots | Still securely attached, no shifting | ☐ |
+| Check plug after 15 shots | Still securely attached, no shifting | ☐ |
 | Check BLE connection | Still connected, no disconnects during shots | ☐ |
 | Check battery after session | Battery % decreased reasonably (< 5%) | ☐ |
 

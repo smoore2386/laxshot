@@ -278,7 +278,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   SizedBox(
                     height: AppSizes.buttonHeight,
                     child: OutlinedButton.icon(
-                      onPressed: () => context.go(AppRoutes.home),
+                      onPressed: () => context.go(AppRoutes.devBypass),
                       icon: const Icon(Icons.fast_forward_rounded, color: Colors.orange),
                       label: const Text(
                         'Skip Login (Dev)',
