@@ -7,6 +7,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/ble_constants.dart';
+import '../../../data/services/analytics_service.dart';
 import '../providers/ble_provider.dart';
 
 class SensorScanScreen extends ConsumerStatefulWidget {
@@ -61,6 +62,9 @@ class _SensorScanScreenState extends ConsumerState<SensorScanScreen> {
       await ref.read(bleServiceProvider).stopScan();
       await ref.read(bleServiceProvider).connect(device);
       if (mounted) {
+        ref.read(analyticsServiceProvider).logSensorConnected(
+              deviceId: device.remoteId.str,
+            );
         context.go(AppRoutes.sensorLive);
       }
     } catch (e) {

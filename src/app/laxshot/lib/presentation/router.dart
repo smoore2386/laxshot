@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../core/constants/app_routes.dart';
 import '../core/config/dev_config.dart';
+import '../data/services/analytics_service.dart';
 import '../features/auth/providers/auth_provider.dart';
 import '../features/auth/screens/age_gate_screen.dart';
 import '../features/auth/screens/login_screen.dart';
@@ -25,8 +26,11 @@ final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
   final currentUser = ref.watch(currentUserModelProvider);
 
+  final analytics = ref.watch(analyticsServiceProvider);
+
   return GoRouter(
     initialLocation: AppRoutes.root,
+    observers: [analytics.observer],
     redirect: (context, state) {
       final isAuthenticated = authState.valueOrNull != null;
       final isLoading = authState.isLoading || currentUser.isLoading;

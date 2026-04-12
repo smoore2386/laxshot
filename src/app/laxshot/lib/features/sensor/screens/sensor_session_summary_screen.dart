@@ -11,6 +11,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../data/repositories/sensor_session_repository.dart';
+import '../../../data/services/analytics_service.dart';
 import '../../../data/services/sensor_coaching_service.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/ble_provider.dart';
@@ -49,6 +50,7 @@ class _SensorSessionSummaryScreenState
     final repo = ref.read(sensorSessionRepositoryProvider);
     await repo.createSensorSession(user.uid, sessionModel);
     await repo.updateStatsFromSensorSession(user.uid, sessionModel);
+    ref.read(analyticsServiceProvider).logSessionSaved();
 
     setState(() {
       _saving = false;

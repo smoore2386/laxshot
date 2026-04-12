@@ -15,4 +15,15 @@ class DevConfig {
   /// to save typing during testing. Set to null to disable.
   static const String? devEmail = kDebugMode ? 'dev@laxshot.test' : null;
   static const String? devPassword = kDebugMode ? 'devpass123' : null;
+
+  /// When true, use [FakeBleService] instead of the real BLE stack so the
+  /// full sensor flow can be tested without hardware.
+  static const bool useFakeBle = kDebugMode;
+
+  /// When true, connect to Firebase Emulator Suite instead of production.
+  /// Requires `firebase emulators:start` to be running locally.
+  static const bool useEmulator = kDebugMode;
+
+  /// Emulator host — 'localhost' for native, '10.0.2.2' for Android emulator.
+  static const String emulatorHost = 'localhost';
 }

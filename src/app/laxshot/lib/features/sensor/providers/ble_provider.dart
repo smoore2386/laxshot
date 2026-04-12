@@ -1,12 +1,16 @@
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/config/dev_config.dart';
 import '../../../data/models/motion_packet.dart';
 import '../../../data/services/ble_service.dart';
+import '../../../data/services/fake_ble_service.dart';
 
 /// Singleton BLE service instance.
+/// Uses [FakeBleService] in debug builds when [DevConfig.useFakeBle] is true,
+/// so the full sensor flow can be exercised without real BLE hardware.
 final bleServiceProvider = Provider<BleService>((ref) {
-  final service = BleService();
+  final service = DevConfig.useFakeBle ? FakeBleService() : BleService();
   ref.onDispose(() => service.dispose());
   return service;
 });

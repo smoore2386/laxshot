@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/constants/app_sizes.dart';
+import '../../../data/repositories/user_repository.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../providers/settings_provider.dart';
 
-class SettingsScreen extends ConsumerStatefulWidget {
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
-  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  bool _gameAlerts = true;
-  bool _weeklyReport = true;
-  bool _autoDeleteVideos = false;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserModelProvider).valueOrNull;
+    final settings = ref.watch(userSettingsProvider).valueOrNull ?? {};
+    final firebaseUser = ref.watch(authStateProvider).valueOrNull;
+
+    final gameAlerts = settings['notificationsEnabled'] as bool? ?? true;
+    final weeklyReport = settings['weeklyReportEnabled'] as bool? ?? true;
+    final autoDeleteVideos = settings['autoDeleteVideos'] as bool? ?? false;
+
+    void updateSetting(String key, dynamic value) {
+      final uid = firebaseUser?.uid;
+      if (uid == null) return;
+      ref.read(userRepositoryProvider).updateSettings(uid, {key: value});
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -37,15 +43,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             icon: Icons.notifications_active,
             label: 'Game Alerts',
             subtitle: 'Reminders to practice',
-            value: _gameAlerts,
-            onChanged: (v) => setState(() => _gameAlerts = v),
+            value: gameAlerts,
+            onChanged: (v) => updateSetting('notificationsEnabled', v),
           ),
           _ToggleTile(
             icon: Icons.bar_chart,
             label: 'Weekly Report',
             subtitle: 'Progress summary every Sunday',
-            value: _weeklyReport,
-            onChanged: (v) => setState(() => _weeklyReport = v),
+            value: weeklyReport,
+            onChanged: (v) => updateSetting('weeklyReportEnabled', v),
           ),
 
           const SizedBox(height: AppSizes.md),
@@ -54,14 +60,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             icon: Icons.delete_sweep,
             label: 'Auto-Delete Videos',
             subtitle: 'Remove videos after analysis (saves storage)',
-            value: _autoDeleteVideos,
-            onChanged: (v) => setState(() => _autoDeleteVideos = v),
+            value: autoDeleteVideos,
+            onChanged: (v) => updateSetting('autoDeleteVideos', v),
           ),
           _ActionTile(
             icon: Icons.download,
             label: 'Download My Data',
             subtitle: 'Export all your stats and sessions',
-            onTap: () {/* TODO: call Cloud Function */},
+            onTap: () => _exportData(context, ref),
           ),
 
           if (user?.isMinor == true) ...[
@@ -100,7 +106,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             iconColor: Colors.orange,
             onTap: () async {
               await ref.read(authServiceProvider).signOut();
-              if (!mounted) return;
+              if (!context.mounted) return;
               context.go(AppRoutes.login);
             },
           ),
@@ -110,7 +116,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             subtitle: 'Permanently remove all your data',
             iconColor: Colors.red,
             labelColor: Colors.red,
-            onTap: () => _confirmDeleteAccount(context),
+            onTap: () => _confirmDeleteAccount(context, ref),
           ),
 
           const SizedBox(height: AppSizes.md),
@@ -118,12 +124,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           _ActionTile(
             icon: Icons.privacy_tip_outlined,
             label: 'Privacy Policy',
-            onTap: () {/* open URL */},
+            onTap: () => _openUrl('https://laxshot.app/privacy'),
           ),
           _ActionTile(
             icon: Icons.description_outlined,
             label: 'Terms of Service',
-            onTap: () {/* open URL */},
+            onTap: () => _openUrl('https://laxshot.app/terms'),
           ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: AppSizes.md),
@@ -136,7 +142,38 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  void _confirmDeleteAccount(BuildContext context) {
+  Future<void> _openUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  void _exportData(BuildContext context, WidgetRef ref) async {
+    final user = ref.read(authStateProvider).valueOrNull;
+    if (user == null) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Preparing your data export...')),
+    );
+
+    try {
+      final result = await ref
+          .read(userRepositoryProvider)
+          .exportUserData(user.uid);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result ?? 'Data export ready!')),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Export failed: $e')),
+      );
+    }
+  }
+
+  void _confirmDeleteAccount(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -151,10 +188,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               Navigator.pop(context);
               try {
                 await ref.read(authServiceProvider).deleteAccount();
-                if (!mounted) return;
+                if (!context.mounted) return;
                 context.go(AppRoutes.login);
               } catch (e) {
-                if (!mounted) return;
+                if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Failed to delete account: $e')),
                 );

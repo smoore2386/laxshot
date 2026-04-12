@@ -2,6 +2,7 @@
 node_modules/
 dist/
 build/
+.pio/
 .expo/
 .metro/
 

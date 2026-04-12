@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/constants/app_sizes.dart';
+import '../../../data/services/analytics_service.dart';
 import '../providers/ble_provider.dart';
 import '../providers/sensor_session_provider.dart';
 import '../widgets/ble_connection_badge.dart';
@@ -49,6 +50,10 @@ class _SensorLiveScreenState extends ConsumerState<SensorLiveScreen> {
   Future<void> _endSession() async {
     await ref.read(sensorSessionProvider.notifier).endSession();
     if (mounted) {
+      final session = ref.read(sensorSessionProvider);
+      ref.read(analyticsServiceProvider).logSensorSessionEnd(
+            shotCount: session.shots.length,
+          );
       context.go(AppRoutes.sensorSummary);
     }
   }

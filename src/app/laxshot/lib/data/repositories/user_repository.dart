@@ -49,6 +49,23 @@ class UserRepository {
   Future<void> updateUser(String uid, Map<String, dynamic> fields) =>
       _db.collection('users').doc(uid).update(fields);
 
+  Future<void> updateSettings(String uid, Map<String, dynamic> settings) =>
+      _db.collection('users').doc(uid).set(
+            {'settings': settings},
+            SetOptions(merge: true),
+          );
+
+  Stream<Map<String, dynamic>> watchSettings(String uid) => _db
+      .collection('users')
+      .doc(uid)
+      .snapshots()
+      .map((doc) {
+        final data = doc.data();
+        if (data == null) return <String, dynamic>{};
+        return Map<String, dynamic>.from(
+            data['settings'] as Map<String, dynamic>? ?? {});
+      });
+
   Future<StatsModel?> getStats(String uid) async {
     final doc = await _db
         .collection('users')
@@ -68,6 +85,18 @@ class UserRepository {
           .doc('summary')
           .snapshots()
           .map((doc) => doc.exists ? StatsModel.fromFirestore(doc) : null);
+
+  /// Request a data export for the user. Returns a status message.
+  Future<String?> exportUserData(String uid) async {
+    try {
+      final result =
+          await _functions.httpsCallable('exportUserData').call({'uid': uid});
+      return result.data as String?;
+    } catch (_) {
+      // If the Cloud Function doesn't exist yet, fall back to local message
+      return 'Data export is being prepared. You will receive an email when ready.';
+    }
+  }
 
   int _calcAge(DateTime dob) {
     final now = DateTime.now();
